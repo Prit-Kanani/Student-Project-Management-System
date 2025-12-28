@@ -1,0 +1,80 @@
+{
+  "Routes": [
+    {
+      "UpstreamPathTemplate": "/api/UserService/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "DownstreamPathTemplate": "/api/UserService/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7165
+        }
+      ],
+      "SwaggerKey": "UserService"
+    },
+    {
+      "UpstreamPathTemplate": "/api/ProjectGroupService/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "DownstreamPathTemplate": "/api/ProjectGroupService/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7242
+        }
+      ],
+      "SwaggerKey": "ProjectGroupService"
+    },
+    {
+      "UpstreamPathTemplate": "/api/ProjectService/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "DownstreamPathTemplate": "/api/ProjectService/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7096
+        }
+      ],
+      "SwaggerKey": "ProjectService"
+    }
+  ],
+
+  "SwaggerEndPoints": [
+    {
+      "Key": "UserService",
+      "Config": [
+        {
+          "Name": "User Service API",
+          "Version": "v1",
+          "Url": "https://localhost:7165/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "ProjectGroupService",
+      "Config": [
+        {
+          "Name": "Project_Group Service API",
+          "Version": "v1",
+          "Url": "https://localhost:7242/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "ProjectService",
+      "Config": [
+        {
+          "Name": "Project Service API",
+          "Version": "v1",
+          "Url": "https://localhost:7096/swagger/v1/swagger.json"
+        }
+      ]
+    }
+  ],
+
+  "GlobalConfiguration": {
+    "BaseUrl": "https://localhost:7095"
+  }
+}

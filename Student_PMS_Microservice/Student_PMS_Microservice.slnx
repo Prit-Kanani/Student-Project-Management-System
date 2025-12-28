@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="ApiGateway/ApiGateway.csproj" Id="e7d291e9-3630-4451-b290-8af379cf37cf" />
+  <Project Path="Comman/Comman.csproj" Id="205c7821-c759-4a9d-80d3-e6a0f645167e" />
+  <Project Path="ProjectGroupService/ProjectGroupService.csproj" />
+  <Project Path="ProjectService/ProjectService.csproj" Id="74acb710-ecc5-47c0-af7b-5188003c568b" />
+  <Project Path="UserService/UserService.csproj" />
+</Solution>

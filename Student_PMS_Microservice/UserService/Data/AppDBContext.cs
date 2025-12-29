@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using UserService.Models;
+using ProjectGroup.Models;
 
-namespace UserService.Data;
+namespace ProjectGroup.Data;
 
 public class AppDbContext : DbContext
 {

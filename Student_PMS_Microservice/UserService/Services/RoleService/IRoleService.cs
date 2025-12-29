@@ -1,7 +1,7 @@
 ﻿using Comman.DTOs.CommanDTOs;
-using UserService.DTOs.RoleDTO;
+using ProjectGroup.DTOs.RoleDTO;
 
-namespace UserService.Services.RoleService;
+namespace ProjectGroup.Services.RoleService;
 
 public interface IRoleService
 {

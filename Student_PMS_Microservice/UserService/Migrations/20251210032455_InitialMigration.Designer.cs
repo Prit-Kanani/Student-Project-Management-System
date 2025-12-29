@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using UserService.Data;
+using ProjectGroup.Data;
 
 #nullable disable
 
-namespace UserService.Migrations
+namespace ProjectGroup.Migrations
 {
     [DbContext(typeof(AppDbContext))]
     [Migration("20251210032455_InitialMigration")]

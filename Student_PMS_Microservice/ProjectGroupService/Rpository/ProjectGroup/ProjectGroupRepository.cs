@@ -3,9 +3,9 @@ using Comman.Functions;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 using ProjectGroupService.DTOs;
+using ProjectGroupService.Exceptions;
 using ProjectGroupServices.Data;
-using UserService.Exceptions;
-
+using ProjectGroupService.Models;
 namespace ProjectGroupService.Rpository.ProjectGroup;
 
 public class ProjectGroupRepository(
@@ -44,7 +44,7 @@ public class ProjectGroupRepository(
     #region CREATE PROJECT GROUP
     public async Task<OperationResultDTO> CreateProjectGroup(ProjectGroupCreateDTO dto)
     {
-        var projectGroup = dto.Adapt<ProjectGroup>();
+        var projectGroup = dto.Adapt<Models.ProjectGroup>();
         projectGroup.Created = DateTime.UtcNow;
         await context.ProjectGroup.AddAsync(projectGroup);
         var rows = await context.SaveChangesAsync();

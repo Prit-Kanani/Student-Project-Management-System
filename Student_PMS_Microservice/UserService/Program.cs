@@ -1,10 +1,10 @@
 ﻿using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using UserService.Data;
-using UserService.Exceptions;
-using UserService.Repository.UserRepository;
-using UserService.Services.UserService;
-using UserService.Validations;
+using ProjectGroup.Data;
+using ProjectGroup.Exceptions;
+using ProjectGroup.Repository.UserRepository;
+using ProjectGroup.Services.UserService;
+using ProjectGroup.Validations;
 
 var builder = WebApplication.CreateBuilder(args);
 

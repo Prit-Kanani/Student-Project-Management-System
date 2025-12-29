@@ -1,8 +1,8 @@
 ﻿using Comman.DTOs.CommanDTOs;
 using Comman.MicroserviceDTO;
-using UserService.DTOs.UserDTO;
+using ProjectGroup.DTOs.UserDTO;
 
-namespace UserService.Services.UserService;
+namespace ProjectGroup.Services.UserService;
 
 public interface IUserService
 {

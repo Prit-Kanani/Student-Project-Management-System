@@ -1,4 +1,4 @@
-﻿namespace UserService.Services.UserService;
+﻿namespace ProjectGroup.Services.UserService;
 
 public class UserMicroservice
 {

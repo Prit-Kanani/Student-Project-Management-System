@@ -1,10 +1,10 @@
 ﻿using Comman.DTOs.CommanDTOs;
 using Comman.MicroserviceDTO;
-using UserService.DTOs.UserDTO;
-using UserService.Exceptions;
-using UserService.Repository.UserRepository;
+using ProjectGroup.DTOs.UserDTO;
+using ProjectGroup.Exceptions;
+using ProjectGroup.Repository.UserRepository;
 
-namespace UserService.Services.UserService;
+namespace ProjectGroup.Services.UserService;
 
 public class UsersService : IUserService
 {

@@ -1,7 +1,8 @@
 ﻿using Newtonsoft.Json;
 using System.Net;
+using UserService.Exceptions;
 
-namespace UserService.Exceptions;
+namespace ProjectGroup.Exceptions;
 
 public class ExceptionMiddleware
 {

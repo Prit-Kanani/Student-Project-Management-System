@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
-using UserService.DTOs.UserDTO;
+using ProjectGroup.DTOs.UserDTO;
 
-namespace UserService.Validations;
+namespace ProjectGroup.Validations;
 
 public class CreateUserValidator : AbstractValidator<UserCreateDTO>
 {

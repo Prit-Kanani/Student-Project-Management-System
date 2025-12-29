@@ -1,12 +1,6 @@
 ﻿namespace ProjectService.Exceptions;
 
-public sealed class ApiException : Exception
+public sealed class ApiException(string message, int statusCode) : Exception(message)
 {
-    public int StatusCode { get; }
-
-    public ApiException(string message, int statusCode)
-        : base(message)
-    {
-        StatusCode = statusCode;
-    }
+    public int StatusCode { get; } = statusCode;
 }

@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using ProjectGroupService.Data;
 using ProjectGroupServices.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +10,8 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddScoped<DataContext>();
 
 // --- Register DbContext ---
 builder.Services.AddDbContext<AppDbContext>(options =>

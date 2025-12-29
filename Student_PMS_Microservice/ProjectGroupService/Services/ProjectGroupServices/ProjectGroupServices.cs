@@ -1,7 +1,7 @@
 ﻿using Comman.DTOs.CommanDTOs;
 using ProjectGroupService.DTOs;
 using ProjectGroupService.Rpository.ProjectGroup;
-using UserService.Exceptions;
+using ProjectGroupService.Exceptions;
 
 namespace ProjectGroupService.Services.ProjectGroupServices;
 

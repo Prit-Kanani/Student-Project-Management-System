@@ -1,8 +1,8 @@
 ﻿using Comman.DTOs.CommanDTOs;
 using Comman.MicroserviceDTO;
-using UserService.DTOs.UserDTO;
+using ProjectGroup.DTOs.UserDTO;
 
-namespace UserService.Repository.UserRepository;
+namespace ProjectGroup.Repository.UserRepository;
 
 public interface IUserRepository
 {

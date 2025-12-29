@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace UserService.Models;
+namespace ProjectGroup.Models;
 
 public class Role
 {

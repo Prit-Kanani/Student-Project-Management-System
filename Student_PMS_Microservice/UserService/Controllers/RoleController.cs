@@ -1,10 +1,10 @@
 ﻿using Comman.DTOs.CommanDTOs;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
-using UserService.DTOs.RoleDTO;
-using UserService.Services.RoleService;
+using ProjectGroup.DTOs.RoleDTO;
+using ProjectGroup.Services.RoleService;
 
-namespace UserService.Controllers;
+namespace ProjectGroup.Controllers;
 
 [Route("api/UserService/[controller]")]
 [ApiController]

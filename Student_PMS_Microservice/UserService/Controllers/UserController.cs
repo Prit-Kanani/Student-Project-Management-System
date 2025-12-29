@@ -3,10 +3,10 @@ using FluentValidation;
 using Comman.DTOs.CommanDTOs;
 using Comman.MicroserviceDTO;
 using Microsoft.AspNetCore.Mvc;
-using UserService.DTOs.UserDTO;
-using UserService.Services.UserService;
+using ProjectGroup.DTOs.UserDTO;
+using ProjectGroup.Services.UserService;
 
-namespace UserService.Controllers;
+namespace ProjectGroup.Controllers;
 
 [Route("api/UserService/[controller]")]
 [ApiController]

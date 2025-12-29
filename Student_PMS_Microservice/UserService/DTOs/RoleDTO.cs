@@ -1,4 +1,4 @@
-﻿namespace UserService.DTOs.RoleDTO;
+﻿namespace ProjectGroup.DTOs.RoleDTO;
 
 public class RoleListDTO
 {

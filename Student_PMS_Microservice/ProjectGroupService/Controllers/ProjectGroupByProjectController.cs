@@ -4,8 +4,8 @@ using Mapster;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProjectGroupService.DTOs;
+using ProjectGroupService.Models;
 using ProjectGroupServices.Data;
-using ProjectGroupServices.Models;
 
 namespace ProjectGroupService.Controllers;
 

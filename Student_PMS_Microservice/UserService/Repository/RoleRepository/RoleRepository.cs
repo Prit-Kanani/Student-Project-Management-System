@@ -2,12 +2,12 @@
 using Comman.Functions;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
-using UserService.Data;
-using UserService.DTOs.RoleDTO;
-using UserService.Exceptions;
-using UserService.Models;
+using ProjectGroup.Data;
+using ProjectGroup.DTOs.RoleDTO;
+using ProjectGroup.Exceptions;
+using ProjectGroup.Models;
 
-namespace UserService.Repository.RoleRepository;
+namespace ProjectGroup.Repository.RoleRepository;
 
 public class RoleRepository : IRoleRepository
 {

@@ -3,13 +3,13 @@ using ProjectGroupService.DTOs;
 
 namespace ProjectGroupService.Services.ProjectGroupByProject;
 
-public interface IProjectGroupByProjectService
+public interface IGroupWiseStudentService
 {
-    Task<ListResult<ProjectGroupListDTO>>   GetProjectGroupByProjectsPage();
-    Task<ProjectGroupByProjectViewDTO>      GetProjectGroupByProjectView(int projectGroupByProjectID);
-    Task<ProjectGroupByProjectUpdateDTO>    GetProjectGroupByProjectPK(int projectGroupByProjectID);
-    Task<OperationResultDTO>                CreateProjectGroupByProject(ProjectGroupCreateDTO dto);
-    Task<OperationResultDTO>                UpdateProjectGroupByProject(ProjectGroupUpdateDTO dto);
-    Task<OperationResultDTO>                DeactivateProjectGroupByProject(int projectGroupByProjectID);
-    Task                                    BulkInsertAsync(List<BulkProjectGroupByProjectCreateDTO> projectGroupByProjects);
+    Task<ListResult<ProjectGroupByProjectListDTO>>      GetProjectGroupByProjectsPage();
+    Task<ProjectGroupByProjectViewDTO>                  GetProjectGroupByProjectView(int projectGroupByProjectID);
+    Task<ProjectGroupByProjectUpdateDTO>                GetProjectGroupByProjectPK(int projectGroupByProjectID);
+    Task<OperationResultDTO>                            CreateProjectGroupByProject(ProjectGroupByProjectCreateDTO dto);
+    Task<OperationResultDTO>                            UpdateProjectGroupByProject(ProjectGroupByProjectUpdateDTO dto);
+    Task<OperationResultDTO>                            DeactivateProjectGroupByProject(int projectGroupByProjectID);
+    Task                                                BulkInsertAsync(List<BulkProjectGroupByProjectCreateDTO> projectGroupByProjects);
 }

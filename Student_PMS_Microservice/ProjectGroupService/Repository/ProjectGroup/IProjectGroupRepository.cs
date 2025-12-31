@@ -3,7 +3,7 @@ using ProjectGroupService.DTOs;
 
 namespace ProjectGroupService.Repository.ProjectGroup;
 
-public interface IProjectGroupRepository
+public interface IGroupWiseStudentRepository
 {
     Task<ListResult<ProjectGroupListDTO>>   GetProjectGroupsPage();
     Task<ProjectGroupViewDTO>               GetProjectGroupView(int projectGroupID);

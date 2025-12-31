@@ -8,7 +8,7 @@ using System.Data;
 
 namespace ProjectGroupService.Services.ProjectGroupByProject;
 
-public class ProjectGroupByProjectService(
+public class GroupWiseStudentService(
         IProjectGroupByProjectRepository repository
 )   : IProjectGroupByProjectRepository
 {

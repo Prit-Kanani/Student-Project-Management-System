@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ProjectGroupService.Models;
-using ProjectGroupServices.Models;
 using System.Collections.Generic;
 
 namespace ProjectGroupServices.Data;

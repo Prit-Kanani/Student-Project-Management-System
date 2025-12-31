@@ -18,7 +18,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Comman\Comman.csproj" />
-    <ProjectReference Include="..\ProjectService\ProjectService.csproj" />
   </ItemGroup>
 
 </Project>

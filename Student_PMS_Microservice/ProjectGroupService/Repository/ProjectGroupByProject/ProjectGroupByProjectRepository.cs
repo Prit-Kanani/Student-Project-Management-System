@@ -2,11 +2,14 @@
 using Comman.Functions;
 using Dapper;
 using Mapster;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using ProjectGroupService.Data;
 using ProjectGroupService.DTOs;
+using ProjectGroupService.Repository.ProjectGroupByProject;
 using ProjectGroupServices.Data;
 using ProjectService.Exceptions;
+using System.Data;
 
 namespace ProjectGroupService.Rpository.ProjectGroupByProject;
 
@@ -95,6 +98,41 @@ public class ProjectGroupByProjectRepository(
         var rows = await EFcontext.SaveChangesAsync();
         var response = new OperationResultDTO { Id = projectGroupByProject.ProjectGroupByProjectID, RowsAffected = rows };
         return response;
+    }
+    #endregion
+
+    #region BULK CREATE PROJECT GROUP BY PROJECT
+    public async Task BulkInsertAsync(List<BulkProjectGroupByProjectCreateDTO> projectGroupByProjects)
+    {
+        using var connection = Dappercontext.CreateConnection();
+        await connection.OpenAsync();
+
+        using var bulkCopy = new SqlBulkCopy(connection)
+        {
+            DestinationTableName = "dbo.ProjectGroupByProject",
+            BatchSize = 1000,
+            BulkCopyTimeout = 60
+        };
+
+        bulkCopy.ColumnMappings.Add("ProjectGroupID", "ProjectGroupID");
+        bulkCopy.ColumnMappings.Add("CreatedByID", "CreatedByID");
+        bulkCopy.ColumnMappings.Add("ProjectID", "ProjectID");
+        bulkCopy.ColumnMappings.Add("IsActive", "IsActive");
+        bulkCopy.ColumnMappings.Add("Created", "Created");
+
+        var table = new DataTable();
+        table.Columns.Add("ProjectGroupID", typeof(int));
+        table.Columns.Add("CreatedByID", typeof(int));
+        table.Columns.Add("ProjectID", typeof(int));
+        table.Columns.Add("IsActive", typeof(bool));
+        table.Columns.Add("Created", typeof(DateTime));
+
+        foreach (var pgbp in projectGroupByProjects)
+        {
+            table.Rows.Add(pgbp.Created,pgbp.IsActive,pgbp.ProjectGroupID, pgbp.CreatedByID, pgbp.ProjectID);
+        }
+
+        await bulkCopy.WriteToServerAsync(table);
     }
     #endregion
 }

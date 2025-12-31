@@ -2,9 +2,10 @@
 using Microsoft.EntityFrameworkCore;
 using ProjectGroup.Data;
 using ProjectGroup.Exceptions;
-using ProjectGroup.Repository.UserRepository;
 using ProjectGroup.Services.UserService;
 using ProjectGroup.Validations;
+using UserService.Repository.UserRepository;
+using UserService.Services.UserService;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -1,13 +1,13 @@
 ﻿using Mapster;
 using Comman.Functions;
 using ProjectGroup.Data;
-using ProjectGroup.Models;
 using Comman.DTOs.CommanDTOs;
 using Comman.MicroserviceDTO;
-using ProjectGroup.DTOs.UserDTO;
 using Microsoft.EntityFrameworkCore;
+using UserService.Models;
+using UserService.DTOs;
 
-namespace ProjectGroup.Repository.UserRepository;
+namespace UserService.Repository.UserRepository;
 
 public class UserRepository(
     AppDbContext context

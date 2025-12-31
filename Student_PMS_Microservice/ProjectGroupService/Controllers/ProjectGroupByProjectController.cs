@@ -11,23 +11,17 @@ namespace ProjectGroupService.Controllers;
 
 [Route("api/ProjectGroupService/[controller]")]
 [ApiController]
-public class ProjectGroupByProjectController : ControllerBase
+public class ProjectGroupByProjectController(
+    AppDbContext context
+) : ControllerBase
 {
-    #region CONFIGURATION
-    private readonly AppDbContext _context;
-    public ProjectGroupByProjectController(AppDbContext context)
-    {
-        _context = context;
-    }
-    #endregion
-
     #region GET PROJECT GROUP BY PROJECT PAGE
     [HttpGet]
     [Route("Page")]
     [Produces<ListResult<ProjectGroupByProjectListDTO>>]
     public async Task<IActionResult> GetProjectGroupByProjectPage()
     {
-        var pgbp = await  _context.ProjectGroupByProject
+        var pgbp = await  context.ProjectGroupByProject
                                                 .Select(pgp => new
                                                 {
                                                     pgp.ProjectGroupByProjectID,
@@ -48,7 +42,7 @@ public class ProjectGroupByProjectController : ControllerBase
     [Produces<ProjectGroupByProjectViewDTO>]
     public async Task<IActionResult> GetProjectGroupByProjectView(int id)
     {
-        var pgbp = await _context.ProjectGroupByProject
+        var pgbp = await context.ProjectGroupByProject
                                             .Where(pgp => pgp.ProjectGroupByProjectID == id)
                                             .Select(pgp => new
                                             {
@@ -76,7 +70,7 @@ public class ProjectGroupByProjectController : ControllerBase
     [Produces<ProjectGroupByProjectUpdateDTO>]
     public async Task<IActionResult> GetProjectGroupByProjectPk(int id)
     {
-        var pgbp = _context.ProjectGroupByProject
+        var pgbp = context.ProjectGroupByProject
                                             .FirstOrDefaultAsync(pgp => pgp.ProjectGroupByProjectID == id);
 
         if(pgbp == null) return NotFound();
@@ -96,9 +90,9 @@ public class ProjectGroupByProjectController : ControllerBase
         var pgbp = dto.Adapt<ProjectGroupByProject>();
         pgbp.Created = DateTime.UtcNow;
 
-        _context.ProjectGroupByProject.Add(pgbp);
+        context.ProjectGroupByProject.Add(pgbp);
 
-        var rows = await _context.SaveChangesAsync();
+        var rows = await context.SaveChangesAsync();
 
         var response = new OperationResultDTO
         {
@@ -116,7 +110,7 @@ public class ProjectGroupByProjectController : ControllerBase
     [Produces<OperationResultDTO>]
     public async Task<IActionResult> UpdateProjectGroupByProject([FromBody] ProjectGroupByProjectUpdateDTO dto)
     {
-        var pgbp = await _context.ProjectGroupByProject
+        var pgbp = await context.ProjectGroupByProject
                             .FirstOrDefaultAsync(pgp => pgp.ProjectGroupByProjectID == dto.ProjectGroupByProjectID);
 
         if(pgbp == null) return NotFound();
@@ -124,7 +118,7 @@ public class ProjectGroupByProjectController : ControllerBase
         dto.Adapt(pgbp);
         pgbp.Modified = DateTime.UtcNow;
 
-        var rows = await _context.SaveChangesAsync();
+        var rows = await context.SaveChangesAsync();
 
         var response = new OperationResultDTO
         {
@@ -141,11 +135,11 @@ public class ProjectGroupByProjectController : ControllerBase
     [Produces<OperationResultDTO>]
     public async Task<IActionResult> DeleteProjectGroupByProject(int id)
     {
-        var pgbp = await _context.ProjectGroupByProject.FirstOrDefaultAsync(pgp => pgp.ProjectGroupByProjectID == id);
+        var pgbp = await context.ProjectGroupByProject.FirstOrDefaultAsync(pgp => pgp.ProjectGroupByProjectID == id);
         if(pgbp == null) return NotFound();
         pgbp.Modified = DateTime.UtcNow;
         pgbp.IsActive = false;
-        var rows = await _context.SaveChangesAsync();
+        var rows = await context.SaveChangesAsync();
         var response = new OperationResultDTO
         {   
             Id = pgbp.ProjectGroupByProjectID,

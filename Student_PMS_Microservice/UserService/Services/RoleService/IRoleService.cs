@@ -1,5 +1,5 @@
 ﻿using Comman.DTOs.CommanDTOs;
-using ProjectGroup.DTOs.RoleDTO;
+using UserService.DTOs;
 
 namespace ProjectGroup.Services.RoleService;
 

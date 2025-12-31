@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using ProjectGroup.Models;
+using UserService.Models;
 
 namespace ProjectGroup.Data;
 

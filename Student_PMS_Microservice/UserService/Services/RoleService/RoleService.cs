@@ -1,9 +1,10 @@
 ﻿using Comman.DTOs.CommanDTOs;
-using ProjectGroup.DTOs.RoleDTO;
-using ProjectGroup.Exceptions;
-using ProjectGroup.Repository.RoleRepository;
+using ProjectGroup.Services.RoleService;
+using UserService.DTOs;
+using UserService.Exceptions;
+using UserService.Repository.RoleRepository;
 
-namespace ProjectGroup.Services.RoleService;
+namespace UserService.Services.RoleService;
 
 public class RoleService : IRoleService
 {

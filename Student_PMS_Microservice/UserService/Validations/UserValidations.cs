@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using ProjectGroup.DTOs.UserDTO;
+using UserService.DTOs;
 
 namespace ProjectGroup.Validations;
 

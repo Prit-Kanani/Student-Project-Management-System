@@ -3,8 +3,8 @@ using FluentValidation;
 using Comman.DTOs.CommanDTOs;
 using Comman.MicroserviceDTO;
 using Microsoft.AspNetCore.Mvc;
-using ProjectGroup.DTOs.UserDTO;
 using ProjectGroup.Services.UserService;
+using UserService.DTOs;
 
 namespace ProjectGroup.Controllers;
 

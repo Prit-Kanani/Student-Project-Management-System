@@ -1,8 +1,8 @@
 ﻿using Comman.DTOs.CommanDTOs;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
-using ProjectGroup.DTOs.RoleDTO;
 using ProjectGroup.Services.RoleService;
+using UserService.DTOs;
 
 namespace ProjectGroup.Controllers;
 

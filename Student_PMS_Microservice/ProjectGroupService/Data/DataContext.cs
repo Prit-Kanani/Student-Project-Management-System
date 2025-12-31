@@ -1,5 +1,4 @@
 ﻿using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
 namespace ProjectGroupService.Data;
 
 public class DataContext(IConfiguration configuration)

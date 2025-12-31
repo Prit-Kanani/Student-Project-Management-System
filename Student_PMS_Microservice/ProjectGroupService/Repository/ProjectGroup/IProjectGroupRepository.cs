@@ -1,7 +1,7 @@
 ﻿using Comman.DTOs.CommanDTOs;
 using ProjectGroupService.DTOs;
 
-namespace ProjectGroupService.Rpository.ProjectGroup;
+namespace ProjectGroupService.Repository.ProjectGroup;
 
 public interface IProjectGroupRepository
 {

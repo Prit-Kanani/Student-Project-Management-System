@@ -3,11 +3,11 @@ using Comman.Functions;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 using ProjectGroup.Data;
-using ProjectGroup.DTOs.RoleDTO;
-using ProjectGroup.Exceptions;
-using ProjectGroup.Models;
+using UserService.DTOs;
+using UserService.Exceptions;
+using UserService.Models;
 
-namespace ProjectGroup.Repository.RoleRepository;
+namespace UserService.Repository.RoleRepository;
 
 public class RoleRepository : IRoleRepository
 {

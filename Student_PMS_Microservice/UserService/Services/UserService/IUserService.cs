@@ -1,6 +1,6 @@
 ﻿using Comman.DTOs.CommanDTOs;
 using Comman.MicroserviceDTO;
-using ProjectGroup.DTOs.UserDTO;
+using UserService.DTOs;
 
 namespace ProjectGroup.Services.UserService;
 

@@ -1,4 +1,4 @@
-﻿namespace ProjectGroup.DTOs.UserDTO;
+﻿namespace UserService.DTOs;
 
 public class UserListDTO
 {

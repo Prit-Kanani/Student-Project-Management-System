@@ -5,8 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using ProjectGroupService.DTOs;
 using ProjectGroupService.Exceptions;
 using ProjectGroupServices.Data;
-using ProjectGroupService.Models;
-namespace ProjectGroupService.Rpository.ProjectGroup;
+namespace ProjectGroupService.Repository.ProjectGroup;
 
 public class ProjectGroupRepository(
     AppDbContext context

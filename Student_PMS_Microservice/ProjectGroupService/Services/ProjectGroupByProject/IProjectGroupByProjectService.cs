@@ -11,4 +11,5 @@ public interface IProjectGroupByProjectService
     Task<OperationResultDTO>                CreateProjectGroupByProject(ProjectGroupCreateDTO dto);
     Task<OperationResultDTO>                UpdateProjectGroupByProject(ProjectGroupUpdateDTO dto);
     Task<OperationResultDTO>                DeactivateProjectGroupByProject(int projectGroupByProjectID);
+    Task                                    BulkInsertAsync(List<BulkProjectGroupByProjectCreateDTO> projectGroupByProjects);
 }

@@ -1,7 +1,7 @@
 ﻿using Comman.DTOs.CommanDTOs;
-using ProjectGroup.DTOs.RoleDTO;
+using UserService.DTOs;
 
-namespace ProjectGroup.Repository.RoleRepository;
+namespace UserService.Repository.RoleRepository;
 
 public interface IRoleRepository
 {

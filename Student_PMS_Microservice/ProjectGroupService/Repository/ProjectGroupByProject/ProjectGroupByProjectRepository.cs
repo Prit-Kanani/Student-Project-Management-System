@@ -7,11 +7,10 @@ using Microsoft.EntityFrameworkCore;
 using ProjectGroupService.Data;
 using ProjectGroupService.DTOs;
 using ProjectGroupService.Exceptions;
-using ProjectGroupService.Repository.ProjectGroupByProject;
 using ProjectGroupServices.Data;
 using System.Data;
 
-namespace ProjectGroupService.Rpository.ProjectGroupByProject;
+namespace ProjectGroupService.Repository.ProjectGroupByProject;
 
 public class ProjectGroupByProjectRepository(
     DataContext Dappercontext,
@@ -21,17 +20,10 @@ public class ProjectGroupByProjectRepository(
     #region GET PROJECT GROUP BY PROJECT PAGE
     public async Task<ListResult<ProjectGroupByProjectListDTO>> GetProjectGroupByProjectsPage()
     {
-        var sql = @"
-                Select
-                            ProjectGroupByProjectID,
-                            ProjectGroupName,
-                            ProjectID,
-                            IsActive
-                From        ProjectGroupByProject
-                ORDER BY    ProjectGroupn=Name
-                    ";
+        var pr = @"PR_ProjectGroupByProjectService_SelectPage";
         var connection = Dappercontext.CreateConnection();
-        var projectGroupByProject = await connection.QueryAsync<ProjectGroupByProjectListDTO>(sql);
+        var projectGroupByProject = await connection.QueryAsync<ProjectGroupByProjectListDTO>
+                                                    (pr, commandType: CommandType.StoredProcedure);
         var response = ReflectionMapper.Map<ListResult<ProjectGroupByProjectListDTO>>(projectGroupByProject);
         return response;
     }
@@ -40,10 +32,12 @@ public class ProjectGroupByProjectRepository(
     #region GET PROJECT GROUP BY PROJECT VIEW
     public async Task<ProjectGroupByProjectViewDTO> GetProjectGroupByProjectView(int projectGroupByProjectID)
     {
-        var projcectGroupByProject = await EFcontext.ProjectGroupByProject
-                                                    .FirstOrDefaultAsync(p => p.ProjectGroupByProjectID == projectGroupByProjectID)
-                                                    ?? throw new ApiException("Project Group not found", 404);
-        var response = ReflectionMapper.Map<ProjectGroupByProjectViewDTO>(projcectGroupByProject);
+        var pr = @"PR_ProjectGroupByProjectService_SelectView";
+        var connection = Dappercontext.CreateConnection();
+        var projectGroupByProject = await connection.QueryAsync<ProjectGroupByProjectViewDTO>
+                                                    (pr, new { projectGroupByProjectID }, commandType: CommandType.StoredProcedure)
+                                                    ?? throw new ApiException("Project Group By Project not found", 404);
+        var response = ReflectionMapper.Map<ProjectGroupByProjectViewDTO>(projectGroupByProject);
         return response;
     }
     #endregion
@@ -51,8 +45,10 @@ public class ProjectGroupByProjectRepository(
     #region GET PROJECT GROUP BY PROJECT PK
     public async Task<ProjectGroupByProjectUpdateDTO> GetProjectGroupByProjectPK(int projectGroupByProjectID)
     {
-        var projectGroupByProject = await EFcontext.ProjectGroupByProject
-                                                   .FirstOrDefaultAsync(p => p.ProjectGroupByProjectID == projectGroupByProjectID)
+        var pr = @"PR_ProjectGroupByProjectService_SelectPK";
+        var connection = Dappercontext.CreateConnection();
+        var projectGroupByProject = await connection.QueryAsync<ProjectGroupByProjectUpdateDTO>
+                                                    (pr, new { projectGroupByProjectID }, commandType: CommandType.StoredProcedure)
                                                    ?? throw new ApiException("Project Group not found", 404);
         var response = ReflectionMapper.Map<ProjectGroupByProjectUpdateDTO>(projectGroupByProject);
         return response;
@@ -62,11 +58,17 @@ public class ProjectGroupByProjectRepository(
     #region CREATE PROJECT GROUP BY PROJECT
     public async Task<OperationResultDTO> CreateProjectGroupByProject(ProjectGroupByProjectCreateDTO dto)
     {
-        var projectGroupByProject = ReflectionMapper.Map<Models.ProjectGroupByProject>(dto);
-        projectGroupByProject.Created = DateTime.UtcNow;
-        await EFcontext.ProjectGroupByProject.AddAsync(projectGroupByProject);
-        var rows = await EFcontext.SaveChangesAsync();
-        var response = new OperationResultDTO { Id = projectGroupByProject.ProjectGroupID, RowsAffected = rows };
+        var parameters = new DynamicParameters(dto);
+        parameters.Add("@ProjectGroupByProjectID", dbType: DbType.Int32, direction: ParameterDirection.Output);
+        parameters.Add("@RowsAffected", dbType: DbType.Int32, direction: ParameterDirection.Output);
+        var connection = Dappercontext.CreateConnection();
+        await connection.ExecuteAsync("PR_ProjectGroupByProjectService_Create", parameters, commandType: CommandType.StoredProcedure );
+
+        var id = parameters.Get<int>("@ProjectGroupByProjectID");
+        var rows = parameters.Get<int>("@RowsAffected");
+
+        if (id == 0 || rows == 0) throw new ApiException("Project Group not found", 404);
+        var response = new OperationResultDTO { Id = id, RowsAffected = rows };
         return response;
     }
     #endregion
@@ -118,18 +120,16 @@ public class ProjectGroupByProjectRepository(
         bulkCopy.ColumnMappings.Add("CreatedByID", "CreatedByID");
         bulkCopy.ColumnMappings.Add("ProjectID", "ProjectID");
         bulkCopy.ColumnMappings.Add("IsActive", "IsActive");
-        bulkCopy.ColumnMappings.Add("Created", "Created");
 
         var table = new DataTable();
         table.Columns.Add("ProjectGroupID", typeof(int));
         table.Columns.Add("CreatedByID", typeof(int));
         table.Columns.Add("ProjectID", typeof(int));
         table.Columns.Add("IsActive", typeof(bool));
-        table.Columns.Add("Created", typeof(DateTime));
 
         foreach (var pgbp in projectGroupByProjects)
         {
-            table.Rows.Add(pgbp.Created,pgbp.IsActive,pgbp.ProjectGroupID, pgbp.CreatedByID, pgbp.ProjectID);
+            table.Rows.Add(pgbp.IsActive,pgbp.ProjectGroupID, pgbp.CreatedByID, pgbp.ProjectID);
         }
 
         await bulkCopy.WriteToServerAsync(table);

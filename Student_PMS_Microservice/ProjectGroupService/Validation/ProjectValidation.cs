@@ -9,7 +9,6 @@ public class InsertValidation : AbstractValidator<ProjectGroupCreateDTO>
     {
         #region Name
         RuleFor(x => x.ProjectGroupName)
-            .Cascade(CascadeMode.Stop)
             .NotEmpty().WithMessage("Project Name is required")
             .MinimumLength(5).WithMessage("Project Name must be at least 5 characters long")
             .MaximumLength(100).WithMessage("Project Name must not exceed 100 characters");

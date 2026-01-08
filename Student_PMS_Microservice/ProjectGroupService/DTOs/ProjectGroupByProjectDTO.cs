@@ -20,10 +20,12 @@ public class ProjectGroupByProjectViewDTO
 
 public class ProjectGroupByProjectCreateDTO
 {
+    public int? ProjectGroupByProjectID { get; set; }
     public int ProjectGroupID { get; set; }
     public int ProjectID { get; set; }
     public bool IsActive { get; set; } = true;
     public int? CreatedByID { get; set; }
+    public int? RowsAffected { get; set; }
 }
 
 public class BulkProjectGroupByProjectCreateDTO
@@ -32,7 +34,6 @@ public class BulkProjectGroupByProjectCreateDTO
     public int ProjectID { get; set; }
     public bool IsActive { get; set; } = true;
     public int? CreatedByID { get; set; }
-    public DateTime Created { get; set; } = DateTime.UtcNow;
 }
 public class ProjectGroupByProjectUpdateDTO
 {

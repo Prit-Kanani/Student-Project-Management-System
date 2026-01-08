@@ -5,8 +5,8 @@ using ProjectGroupService.Repository.ProjectGroup;
 
 namespace ProjectGroupService.Services.ProjectGroupServices;
 
-public class ProjectGroupByProjectService(
-    IGroupWiseStudentRepository repository 
+public class ProjectGroupService(
+    IProjectGroupRepository repository 
     /*, MicroserviceGateway gateway*/
 ) : IProjectGroupServices
 {

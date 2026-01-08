@@ -1,16 +1,12 @@
 ﻿using Comman.DTOs.CommanDTOs;
-using Comman.Functions;
-using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
 using ProjectGroupService.DTOs;
 using ProjectGroupService.Repository.ProjectGroupByProject;
-using System.Data;
 
 namespace ProjectGroupService.Services.ProjectGroupByProject;
 
-public class GroupWiseStudentService(
+public class ProjectGroupByProjectService(
         IProjectGroupByProjectRepository repository
-)   : IProjectGroupByProjectRepository
+)   : IProjectGroupByProjectService
 {
     #region GET PROJECT GROUP BY PROJECT PAGE
     public async Task<ListResult<ProjectGroupByProjectListDTO>> GetProjectGroupByProjectsPage()

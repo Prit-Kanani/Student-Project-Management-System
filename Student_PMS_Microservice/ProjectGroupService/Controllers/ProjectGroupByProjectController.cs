@@ -8,7 +8,7 @@ namespace ProjectGroupService.Controllers;
 [Route("api/ProjectGroupService/[controller]")]
 [ApiController]
 public class ProjectGroupByProjectController(
-    IGroupWiseStudentService projecjectGroupByProjectService
+    IProjectGroupByProjectService projecjectGroupByProjectService
 ) : ControllerBase
 {
     #region GET PROJECT GROUP BY PROJECT PAGE

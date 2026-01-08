@@ -7,9 +7,9 @@ using ProjectGroupService.Exceptions;
 using ProjectGroupServices.Data;
 namespace ProjectGroupService.Repository.ProjectGroup;
 
-public class GroupWiseStudentRepository(
+public class ProjectGroupRepository(
     AppDbContext context
-) : IGroupWiseStudentRepository
+) : IProjectGroupRepository
 {
     #region GET PROJECT GROUP PAGE
     public async Task<ListResult<ProjectGroupListDTO>> GetProjectGroupsPage()

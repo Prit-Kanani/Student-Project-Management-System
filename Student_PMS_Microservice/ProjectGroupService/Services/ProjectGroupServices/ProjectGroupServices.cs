@@ -23,7 +23,7 @@ public class ProjectGroupService(
     public async Task<ProjectGroupViewDTO> GetProjectGroupView(int projectGroupID)
     {
         var response = await repository.GetProjectGroupView(projectGroupID)
-                                        ?? throw new ApiException("Project Group not found", 404);
+                                        ?? throw new NotFoundException("Project Group not found");
         return response;
     }
     #endregion
@@ -32,7 +32,7 @@ public class ProjectGroupService(
     public async Task<ProjectGroupUpdateDTO> GetProjectGroupPK(int projectGroupID)
     {
         var response = await repository.GetProjectGroupPK(projectGroupID)
-                                        ?? throw new ApiException("Project Group not found", 404);
+                                        ?? throw new NotFoundException("Project Group not found");
         return response;
     }
     #endregion
@@ -49,7 +49,7 @@ public class ProjectGroupService(
     public async Task<OperationResultDTO> UpdateProjectGroup(ProjectGroupUpdateDTO dto)
     {
         var response = await repository.UpdateProjectGroup(dto)
-                                            ?? throw new ApiException("Project Group not found", 404);
+                                            ?? throw new NotFoundException("Project Group not found");
         return response;
     }
     #endregion
@@ -58,7 +58,7 @@ public class ProjectGroupService(
     public async Task<OperationResultDTO> DeactivateProjectGroup(int projectGroupID)
     {
         var response = await repository.DeactivateProjectGroup(projectGroupID)
-                                            ?? throw new ApiException("Project Group not found", 404);
+                                            ?? throw new NotFoundException("Project Group not found");
         return response;
     }
     #endregion

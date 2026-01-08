@@ -24,7 +24,7 @@ public class GroupWiseStudentRepository(
     public async Task<GroupWiseStudentViewDTO> GetGroupWiseStudentView(int groupWiseStudentID)
     {
         var groupWiseStudent = context.GroupWiseStudent.FirstOrDefaultAsync(p => p.StudentWiseGroupID == groupWiseStudentID)
-                                        ?? throw new ApiException("Studnet Group not found", 404);
+                                        ?? throw new NotFoundException("Studnet Group not found");
         var response = ReflectionMapper.Map<GroupWiseStudentViewDTO>(groupWiseStudent);
         return response;
     }
@@ -34,7 +34,7 @@ public class GroupWiseStudentRepository(
     public async Task<GroupWiseStudentUpdateDTO> GetGroupWiseStudentPK(int groupWiseStudentID)
     {
         var groupWiseStudent = await context.GroupWiseStudent.FirstOrDefaultAsync(p => p.StudentWiseGroupID == groupWiseStudentID)
-                                            ?? throw new ApiException("Student Group not found", 404);
+                                            ?? throw new NotFoundException("Studnet Group not found");
         var response = ReflectionMapper.Map<GroupWiseStudentUpdateDTO>(groupWiseStudent);
         return response;
     }
@@ -56,7 +56,7 @@ public class GroupWiseStudentRepository(
     public async Task<OperationResultDTO> UpdateGroupWiseStudent(GroupWiseStudentUpdateDTO dto)
     {
         var groupWiseStudent = await context.GroupWiseStudent.FirstOrDefaultAsync(p => p.StudentWiseGroupID == dto.StudentWiseGroupID)
-                                              ?? throw new ApiException("Student Group not found", 404);
+                                              ?? throw new NotFoundException("Studnet Group not found");
         dto.Adapt(groupWiseStudent);
         groupWiseStudent.Modified = DateTime.UtcNow;
         var rows = await context.SaveChangesAsync();
@@ -69,7 +69,7 @@ public class GroupWiseStudentRepository(
     public async Task<OperationResultDTO> DeactivateGroupWiseStudent(int groupWiseStudentID)
     {
         var projectGroup = await context.GroupWiseStudent.FirstOrDefaultAsync(p => p.StudentWiseGroupID == groupWiseStudentID)
-                                           ?? throw new ApiException("Student Group not found", 404);
+                                           ?? throw new NotFoundException("Studnet Group not found");
         projectGroup.IsActive = false;
         projectGroup.Modified = DateTime.UtcNow;
         var rows = await context.SaveChangesAsync();

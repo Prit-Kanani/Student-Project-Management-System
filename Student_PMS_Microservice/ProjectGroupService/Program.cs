@@ -1,12 +1,15 @@
-using Microsoft.AspNetCore.Diagnostics;
+﻿using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProjectGroupService.Data;
+using ProjectGroupService.Exceptions;
 using ProjectGroupService.Repository.GroupWiseStudent;
 using ProjectGroupService.Repository.ProjectGroup;
 using ProjectGroupService.Repository.ProjectGroupByProject;
 using ProjectGroupService.Services.GroupWiseStudent;
 using ProjectGroupService.Services.ProjectGroupByProject;
 using ProjectGroupService.Services.ProjectGroupServices;
+using ProjectGroupService.Validation;
 using ProjectGroupServices.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -35,20 +38,28 @@ builder.Services.AddScoped<IProjectGroupServices, ProjectGroupService.Services.P
 builder.Services.AddScoped<IProjectGroupRepository, ProjectGroupRepository>();
 
 
+builder.Services.AddScoped<InsertValidation>();
+builder.Services.AddScoped<UpdateValidation>();
+
 var app = builder.Build();
 
+app.MapGet("/ping", () => "pong");
 
-// --- Register DbContext ---
+
+// ---FluentValidation ExeptionHandaler ---
 app.UseExceptionHandler(builder =>
 {
     builder.Run(async context =>
     {
-        var exception = context.Features.Get<IExceptionHandlerFeature>()?.Error;
+        var feature = context.Features.Get<IExceptionHandlerFeature>();
+        var exception = feature?.Error;
 
+        context.Response.ContentType = "application/json";
+
+        // 🔹 FluentValidation
         if (exception is FluentValidation.ValidationException fvEx)
         {
             context.Response.StatusCode = StatusCodes.Status400BadRequest;
-            context.Response.ContentType = "application/json";
 
             var errors = fvEx.Errors
                 .GroupBy(e => e.PropertyName)
@@ -62,9 +73,34 @@ app.UseExceptionHandler(builder =>
                 message = "Validation failed",
                 errors
             });
+
+            return;
         }
+
+        // 🔹 Your custom API exceptions
+        if (exception is ApiException apiEx)
+        {
+            context.Response.StatusCode = apiEx.StatusCode;
+
+            await context.Response.WriteAsJsonAsync(new
+            {
+                message = apiEx.Message
+            });
+
+            return;
+        }
+
+        // 🔹 True unknown errors (actual 500)
+        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+
+        await context.Response.WriteAsJsonAsync(new
+        {
+            message = "Internal Server Error"
+        });
     });
 });
+
+
 
 
 

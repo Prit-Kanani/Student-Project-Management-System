@@ -24,7 +24,7 @@ public class ProjectGroupRepository(
     public async Task<ProjectGroupViewDTO> GetProjectGroupView(int projectGroupID)
     {
         var project = context.ProjectGroup.FirstOrDefaultAsync(p => p.ProjectGroupID == projectGroupID)
-                                        ?? throw new ApiException("Project Group not found", 404);
+                                        ?? throw new NotFoundException("Project Group not found");
         var response = ReflectionMapper.Map<ProjectGroupViewDTO>(project);
         return response;
     }
@@ -34,7 +34,7 @@ public class ProjectGroupRepository(
     public async Task<ProjectGroupUpdateDTO> GetProjectGroupPK(int projectGroupID)
     {
         var projectGroup = await context.ProjectGroup.FirstOrDefaultAsync(p => p.ProjectGroupID == projectGroupID)
-                                            ?? throw new ApiException("Project Group not found", 404);
+                                            ?? throw new NotFoundException("Project Group not found");
         var response = ReflectionMapper.Map<ProjectGroupUpdateDTO>(projectGroup);
         return response;
     }
@@ -56,7 +56,7 @@ public class ProjectGroupRepository(
     public async Task<OperationResultDTO> UpdateProjectGroup(ProjectGroupUpdateDTO dto)
     {
         var projectGroup = await context.ProjectGroup.FirstOrDefaultAsync(p => p.ProjectGroupID == dto.ProjectGroupID)
-                                              ?? throw new ApiException("Project not found", 404);
+                                              ?? throw new NotFoundException("Project Group not found");
         dto.Adapt(projectGroup);
         projectGroup.Modified = DateTime.UtcNow;
         var rows = await context.SaveChangesAsync();
@@ -69,7 +69,7 @@ public class ProjectGroupRepository(
     public async Task<OperationResultDTO> DeactivateProjectGroup(int projectGroupID)
     {
         var projectGroup = await context.ProjectGroup.FirstOrDefaultAsync(p => p.ProjectGroupID == projectGroupID)
-                                           ?? throw new ApiException("Project not found", 404);
+                                           ?? throw new NotFoundException("Project Group not found");
         projectGroup.IsActive = false;
         projectGroup.Modified = DateTime.UtcNow;
         var rows = await context.SaveChangesAsync();

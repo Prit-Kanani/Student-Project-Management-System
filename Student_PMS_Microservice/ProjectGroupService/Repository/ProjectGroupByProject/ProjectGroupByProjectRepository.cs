@@ -36,7 +36,7 @@ public class ProjectGroupByProjectRepository(
         var connection = Dappercontext.CreateConnection();
         var projectGroupByProject = await connection.QueryAsync<ProjectGroupByProjectViewDTO>
                                                     (pr, new { projectGroupByProjectID }, commandType: CommandType.StoredProcedure)
-                                                    ?? throw new ApiException("Project Group By Project not found", 404);
+                                                    ?? throw new NotFoundException("Project Group By Project not found");
         var response = ReflectionMapper.Map<ProjectGroupByProjectViewDTO>(projectGroupByProject);
         return response;
     }
@@ -49,7 +49,7 @@ public class ProjectGroupByProjectRepository(
         var connection = Dappercontext.CreateConnection();
         var projectGroupByProject = await connection.QueryAsync<ProjectGroupByProjectUpdateDTO>
                                                     (pr, new { projectGroupByProjectID }, commandType: CommandType.StoredProcedure)
-                                                   ?? throw new ApiException("Project Group not found", 404);
+                                                   ?? throw new NotFoundException("Project Group not found");
         var response = ReflectionMapper.Map<ProjectGroupByProjectUpdateDTO>(projectGroupByProject);
         return response;
     }
@@ -67,7 +67,7 @@ public class ProjectGroupByProjectRepository(
         var id = parameters.Get<int>("@ProjectGroupByProjectID");
         var rows = parameters.Get<int>("@RowsAffected");
 
-        if (id == 0 || rows == 0) throw new ApiException("Project Group not found", 404);
+        if (id == 0 || rows == 0)  throw new NotFoundException("Project Group not found");
         var response = new OperationResultDTO { Id = id, RowsAffected = rows };
         return response;
     }
@@ -78,7 +78,7 @@ public class ProjectGroupByProjectRepository(
     {
         var projectGroupByProject = await EFcontext.ProjectGroupByProject
                                                    .FirstOrDefaultAsync(p => p.ProjectGroupByProjectID == dto.ProjectGroupByProjectID)
-                                                   ?? throw new ApiException("Project Group not found", 404);
+                                                   ?? throw new NotFoundException("Project Group not found");
         dto.Adapt(projectGroupByProject);
         projectGroupByProject.Modified = DateTime.UtcNow;
         EFcontext.ProjectGroupByProject.Update(projectGroupByProject);
@@ -93,7 +93,7 @@ public class ProjectGroupByProjectRepository(
     {
         var projectGroupByProject = await EFcontext.ProjectGroupByProject
                                                    .FirstOrDefaultAsync(p => p.ProjectGroupByProjectID == projectGroupByProjectID)
-                                                   ?? throw new ApiException("Project Group not found", 404);
+                                                   ?? throw new NotFoundException("Project Group not found");
         projectGroupByProject.IsActive = false;
         projectGroupByProject.Modified = DateTime.UtcNow;
         EFcontext.ProjectGroupByProject.Update(projectGroupByProject);

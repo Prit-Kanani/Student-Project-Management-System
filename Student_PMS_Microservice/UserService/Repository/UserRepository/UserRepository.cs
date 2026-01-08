@@ -65,7 +65,7 @@ public class UserRepository(
     {
         var user = dto.Adapt<User>();
         user.Created = DateTime.UtcNow;
-        user.Password = hashPass.HashPassword(dto.Password);
+        user.Password = HashPass.HashPassword(dto.Password);
         await context.User.AddAsync(user);
         var rows = await context.SaveChangesAsync();
         var response = new OperationResultDTO{ Id = user.UserID , RowsAffected = rows };

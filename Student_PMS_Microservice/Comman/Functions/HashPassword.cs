@@ -2,7 +2,7 @@
 
 public class HashPass
 {
-    public string HashPassword(string password)
+    public static string HashPassword(string password)
     {
         using var sha = System.Security.Cryptography.SHA256.Create();
         var bytes = System.Text.Encoding.UTF8.GetBytes(password);

@@ -46,7 +46,7 @@ var app = builder.Build();
 app.MapGet("/ping", () => "pong");
 
 
-// ---FluentValidation ExeptionHandaler ---
+// --- ExeptionHandaler ---
 app.UseExceptionHandler(builder =>
 {
     builder.Run(async context =>

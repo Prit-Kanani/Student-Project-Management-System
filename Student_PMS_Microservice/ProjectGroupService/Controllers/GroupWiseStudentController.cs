@@ -46,7 +46,7 @@ public class GroupWiseStudentController(
     #endregion
 
     #region CREATE STUDENT WISE GROUP
-    [HttpGet]
+    [HttpPost]
     [Route("Create")]
     [Produces<OperationResultDTO>]
     public async Task<IActionResult> CreateGroupWiseStudent([FromBody] GroupWiseStudentCreateDTO dto)
@@ -57,7 +57,7 @@ public class GroupWiseStudentController(
     #endregion
 
     #region UPDATE STUDENT WISE GROUP
-    [HttpGet]
+    [HttpPost]
     [Route("Update")]
     [Produces<OperationResultDTO>]
     public async Task<IActionResult> UpdateGroupWiseStudent([FromBody] GroupWiseStudentUpdateDTO dto)
@@ -68,7 +68,7 @@ public class GroupWiseStudentController(
     #endregion
 
     #region DEACTIVATE STUDENT WISE GROUP
-    [HttpGet]
+    [HttpDelete]
     [Route("Deactivate/{groupWiseStudentId:int}")]
     [Produces<OperationResultDTO>]
     public async Task<IActionResult> DeactivateGroupWiseStudent(int groupWiseStudentId)

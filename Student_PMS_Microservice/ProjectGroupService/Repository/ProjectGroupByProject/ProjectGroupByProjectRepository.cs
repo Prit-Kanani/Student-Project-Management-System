@@ -67,7 +67,7 @@ public class ProjectGroupByProjectRepository(
         var id = parameters.Get<int>("@ProjectGroupByProjectID");
         var rows = parameters.Get<int>("@RowsAffected");
 
-        if (id == 0 || rows == 0)  throw new NotFoundException("Project Group not found");
+        if (id == 0 || rows == 0)  throw new NotFoundException("Project Group By Project not found");
         var response = new OperationResultDTO { Id = id, RowsAffected = rows };
         return response;
     }

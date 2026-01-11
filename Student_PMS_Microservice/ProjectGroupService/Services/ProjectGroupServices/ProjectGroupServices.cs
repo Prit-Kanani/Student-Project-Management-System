@@ -22,8 +22,7 @@ public class ProjectGroupService(
     #region GET PROJECT GROUP VIEW
     public async Task<ProjectGroupViewDTO> GetProjectGroupView(int projectGroupID)
     {
-        var response = await repository.GetProjectGroupView(projectGroupID)
-                                        ?? throw new NotFoundException("Project Group not found");
+        var response = await repository.GetProjectGroupView(projectGroupID);
         return response;
     }
     #endregion
@@ -31,8 +30,7 @@ public class ProjectGroupService(
     #region GET PROJECT GROUP PK
     public async Task<ProjectGroupUpdateDTO> GetProjectGroupPK(int projectGroupID)
     {
-        var response = await repository.GetProjectGroupPK(projectGroupID)
-                                        ?? throw new NotFoundException("Project Group not found");
+        var response = await repository.GetProjectGroupPK(projectGroupID);
         return response;
     }
     #endregion
@@ -57,8 +55,7 @@ public class ProjectGroupService(
     #region DEACTIVATE PROJECT GROUP
     public async Task<OperationResultDTO> DeactivateProjectGroup(int projectGroupID)
     {
-        var response = await repository.DeactivateProjectGroup(projectGroupID)
-                                            ?? throw new NotFoundException("Project Group not found");
+        var response = await repository.DeactivateProjectGroup(projectGroupID);
         return response;
     }
     #endregion

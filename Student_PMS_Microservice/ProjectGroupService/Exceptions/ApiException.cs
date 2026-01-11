@@ -1,31 +1,19 @@
 ﻿namespace ProjectGroupService.Exceptions;
 
-public abstract class ApiException : Exception
+public abstract class ApiException(string message, int statusCode) : Exception(message)
 {
-    public int StatusCode { get; }
-
-    protected ApiException(string message, int statusCode)
-        : base(message)
-    {
-        StatusCode = statusCode;
-    }
+    public int StatusCode { get; } = statusCode;
 }
 
 
-public sealed class BadRequestException : ApiException
+public sealed class BadRequestException(string message) : ApiException(message, StatusCodes.Status400BadRequest)
 {
-    public BadRequestException(string message)
-        : base(message, StatusCodes.Status400BadRequest) { }
 }
 
-public sealed class NotFoundException : ApiException
+public sealed class NotFoundException(string message) : ApiException(message, StatusCodes.Status404NotFound)
 {
-    public NotFoundException(string message)
-        : base(message, StatusCodes.Status404NotFound) { }
 }
 
-public sealed class UnauthorizedException : ApiException
+public sealed class UnauthorizedException(string message) : ApiException(message, StatusCodes.Status401Unauthorized)
 {
-    public UnauthorizedException(string message)
-        : base(message, StatusCodes.Status401Unauthorized) { }
 }

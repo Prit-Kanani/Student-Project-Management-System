@@ -4,7 +4,7 @@ namespace ProjectGroupService.Data;
 public class DataContext(IConfiguration configuration)
 {
 
-    private readonly string _connectionString = configuration.GetConnectionString("DefaultConnection")
+    private readonly string _connectionString = configuration.GetConnectionString("myConnectionString")
         ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
     public SqlConnection CreateConnection() => new(_connectionString);

@@ -37,7 +37,7 @@ builder.Services.AddScoped<IProjectGroupByProjectRepository, ProjectGroupByProje
 builder.Services.AddScoped<IProjectGroupServices, ProjectGroupService.Services.ProjectGroupServices.ProjectGroupService>();
 builder.Services.AddScoped<IProjectGroupRepository, ProjectGroupRepository>();
 
-
+builder.Services.AddMemoryCache();
 builder.Services.AddScoped<InsertValidation>();
 builder.Services.AddScoped<UpdateValidation>();
 

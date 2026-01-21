@@ -26,6 +26,19 @@ builder.Services.AddScoped<DataContext>();
 // --- Register DbContext ---
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("myConnectionString")));
+#region Reddis Implementation
+// 1. Connection String
+var redisConnection = builder.Configuration.GetConnectionString("RedisURL");
+
+// 2. Register Redis Cache
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = redisConnection;
+    options.InstanceName = "ProjectGroupSys_"; // All keys will start with this
+});
+#endregion
+
+#region Services and Repository
 
 // --- Register Services and Repository ---
 builder.Services.AddScoped<IGroupWiseStudentRepository, GroupWiseStudentRepository>();
@@ -40,6 +53,8 @@ builder.Services.AddScoped<IProjectGroupRepository, ProjectGroupRepository>();
 builder.Services.AddMemoryCache();
 builder.Services.AddScoped<InsertValidation>();
 builder.Services.AddScoped<UpdateValidation>();
+
+#endregion
 
 var app = builder.Build();
 

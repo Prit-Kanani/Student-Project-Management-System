@@ -2,20 +2,50 @@
 using Comman.Functions;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
 using ProjectGroupService.DTOs;
 using ProjectGroupService.Exceptions;
 using ProjectGroupServices.Data;
+using System.Text.Json;
+
 namespace ProjectGroupService.Repository.ProjectGroup;
 
 public class ProjectGroupRepository(
-    AppDbContext context
+    AppDbContext context,
+    IDistributedCache cache
 ) : IProjectGroupRepository
 {
     #region GET PROJECT GROUP PAGE
     public async Task<ListResult<ProjectGroupListDTO>> GetProjectGroupsPage()
     {
+        #region Cache Implementation
+        var cacheKey = $"ProjectGroupPage";
+
+        // 1. Try to fetch from Redis
+        var cachedData = await cache.GetStringAsync(cacheKey);
+        if (!string.IsNullOrEmpty(cachedData))
+        {
+            // CACHE HIT: We found it!
+            var cachedResponse = JsonSerializer.Deserialize<ListResult<ProjectGroupListDTO>>(cachedData);
+            if (cachedResponse is not null)
+            {
+                return cachedResponse;
+            }
+        }
+        #endregion
+
+        // 2. CACHE MISS: Not in Redis, go to Database
         var projectGroups = await context.ProjectGroup.AsNoTracking().ToListAsync();
         var response = ReflectionMapper.Map<ListResult<ProjectGroupListDTO>>(projectGroups);
+
+        // 3. Store in Redis for next time (expires in 10 minutes)
+        var cacheOptions = new DistributedCacheEntryOptions
+        {
+            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10)
+        };
+        string serializedData = JsonSerializer.Serialize(response);
+        await cache.SetStringAsync(cacheKey, serializedData, cacheOptions);
+
         return response;
     }
     #endregion

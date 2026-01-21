@@ -1,5 +1,4 @@
-﻿using Azure;
-using Comman.DTOs.CommanDTOs;
+﻿using Comman.DTOs.CommanDTOs;
 using Comman.Functions;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
@@ -8,6 +7,7 @@ using ProjectGroupService.DTOs;
 using ProjectGroupService.Exceptions;
 using ProjectGroupServices.Data;
 using System.Text.Json;
+
 namespace ProjectGroupService.Repository.ProjectGroup;
 
 public class ProjectGroupRepository(

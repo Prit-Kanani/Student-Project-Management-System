@@ -1,4 +1,4 @@
-﻿using RabbitMQ.Client;
+﻿/*using RabbitMQ.Client;
 using System.Text;
 using System.Text.Json;
 
@@ -55,3 +55,4 @@ public class RabbitMQBus : IMessageBus, IDisposable
         _connection?.Dispose();
     }
 }
+*/

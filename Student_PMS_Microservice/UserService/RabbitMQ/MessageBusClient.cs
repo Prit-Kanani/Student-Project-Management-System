@@ -1,4 +1,4 @@
-﻿using System.Text;
+﻿/*using System.Text;
 using System.Text.Json;
 using LMS.RequestService.DTOs;
 using RabbitMQ.Client; // Ensure version 7.0+
@@ -63,4 +63,4 @@ namespace LMS.RequestService.Messaging
             _connection?.Dispose();
         }
     }
-}
+}*/

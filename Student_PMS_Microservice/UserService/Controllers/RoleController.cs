@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using ProjectGroup.Services.RoleService;
 using UserService.DTOs;
 
-namespace ProjectGroup.Controllers;
+namespace UserService.Controllers;
 
 [Route("api/UserService/[controller]")]
 [ApiController]

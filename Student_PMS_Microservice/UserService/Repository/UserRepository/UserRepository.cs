@@ -36,7 +36,6 @@ public class UserRepository(
             {
                 u.Name,
                 u.Email,
-                u.Phone,
                 u.IsActive,
                 u.Created,
                 u.Modified,

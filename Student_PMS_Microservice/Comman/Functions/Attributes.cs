@@ -1,5 +1,4 @@
-﻿using System;
-namespace Comman.Functions;
+﻿namespace Comman.Functions;
 
 [AttributeUsage(AttributeTargets.Property)]
 public sealed class OptionIdAttribute : Attribute

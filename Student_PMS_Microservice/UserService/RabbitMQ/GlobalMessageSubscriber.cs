@@ -1,6 +1,4 @@
-﻿using RabbitMQ.Client;
-using RabbitMQ.Client.Events;
-using System.Text;
+﻿/*using System.Text;
 using System.Text.Json;
 
 namespace ProjectGroupService.RabbitMQ;
@@ -64,4 +62,4 @@ public class GlobalMessageSubscriber<T, THandler>(
 public interface IIntegrationEventHandler<in T>
 {
     Task Handle(T @event);
-}
+}*/

@@ -9,14 +9,12 @@ using UserService.Models;
 
 namespace UserService.Repository.RoleRepository;
 
-public class RoleRepository : IRoleRepository
+public class RoleRepository(
+    AppDbContext context
+) : IRoleRepository
 {
     #region CONFIGURATION
-    private readonly AppDbContext _context;
-    public RoleRepository(AppDbContext context)
-    {
-        _context = context;
-    }
+    private readonly AppDbContext _context = context;
     #endregion
 
     #region GET ROLE PAGE

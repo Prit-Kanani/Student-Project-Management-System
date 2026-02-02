@@ -13,13 +13,15 @@ namespace UserService.Controllers;
 public class UserController(
         IUserService userService,
         IValidator<UserCreateDTO> Create,
-        IValidator<UserUpdateDTO> Update
+        IValidator<UserUpdateDTO> Update,
+        ILogger<UserController> logger
 ) : ControllerBase 
 {
     #region CONFIGURATION
     private readonly IUserService _userService = userService;
     private readonly IValidator<UserCreateDTO> _create = Create;
     private readonly IValidator<UserUpdateDTO> _update = Update;
+    private readonly ILogger<UserController>   _logger = logger;
     #endregion
 
     #region GET USERS  PAGE
@@ -28,6 +30,7 @@ public class UserController(
     [Produces<ListResult<UserListDTO>>]
     public async Task<IActionResult> GetUsers()
     {
+        _logger.LogInformation("User Page (GetUsers) endpoint called");
         var response = await _userService.GetUsersPage();
         return Ok(response);
     }

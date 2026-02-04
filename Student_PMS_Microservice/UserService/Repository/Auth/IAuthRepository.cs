@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using UserService.DTOs;
+﻿using UserService.DTOs;
 
 namespace UserService.Repository.Auth;
 

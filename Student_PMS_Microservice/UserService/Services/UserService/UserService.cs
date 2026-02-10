@@ -7,14 +7,13 @@ using UserService.Repository.UserRepository;
 
 namespace UserService.Services.UserService;
 
-public class UsersService : IUserService
+public class UsersService(
+    IUserRepository repository 
+    /*, MicroserviceGateway gateway*/
+) : IUserService
 {
     #region CONFIGURATION
-    private readonly IUserRepository _repository;
-    //private readonly MicroserviceGateway _gateway;
-
-    public UsersService(IUserRepository repository /*, MicroserviceGateway gateway*/) 
-        => _repository = repository;//_gatway = gatway;
+    private readonly IUserRepository _repository = repository;
     #endregion
 
     #region GET USERS PAGE
@@ -53,8 +52,7 @@ public class UsersService : IUserService
     public async Task<OperationResultDTO> UpdateUser(UserUpdateDTO dto)
     {
         var result = await _repository.UpdateUser(dto);
-        if(result != null) throw new ApiException("User not found", 404);
-        return result;
+        return result ?? throw new NotFoundException("User not found");
     }
     #endregion
 
@@ -62,7 +60,7 @@ public class UsersService : IUserService
     public async Task<OperationResultDTO> DeactivateUser(int userID)
     {
         var result = await _repository.DeactivateUser(userID);
-        return result == null ? throw new ApiException("User not found", 404) : result;
+        return result ?? throw new NotFoundException("User not found");
     }
     #endregion
 

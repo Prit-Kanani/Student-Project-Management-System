@@ -31,7 +31,7 @@ public class RoleRepository(
     {
         var role = await _context.Role
             .Where(r => r.RoleID == roleID)
-            .FirstOrDefaultAsync() ?? throw new NotFoundException("Role not found");
+            .FirstOrDefaultAsync() ?? throw new ApiException("Role not found", 404);
 
         var result = ReflectionMapper.Map<RoleUpdateDTO>(role);
 
@@ -55,7 +55,7 @@ public class RoleRepository(
                 r.Created,
                 r.Modified
             })
-            .FirstOrDefaultAsync() ?? throw new NotFoundException("Role not found");
+            .FirstOrDefaultAsync() ?? throw new ApiException("Role not found", 404);
         ;
 
         var result = ReflectionMapper.Map<RoleViewDTO>(role);
@@ -85,7 +85,7 @@ public class RoleRepository(
     #region DEACTIVATE ROLE
     public async Task<OperationResultDTO> DeactivateRole(int roleID)
     {
-        var role = await _context.Role.FindAsync(roleID) ?? throw new NotFoundException("Role not found");
+        var role = await _context.Role.FindAsync(roleID) ?? throw new ApiException("Role not found", 404);
         role.IsActive = false;
         role.Modified = DateTime.UtcNow;
 
@@ -102,7 +102,7 @@ public class RoleRepository(
     #region UPDATE ROLE
     public async Task<OperationResultDTO> UpdateRole(RoleUpdateDTO dto)
     {
-        var role = await _context.Role.FindAsync(dto.RoleID) ?? throw new NotFoundException("Role not found");
+        var role = await _context.Role.FindAsync(dto.RoleID) ?? throw new ApiException("Role not found", 404);
         dto.Adapt(role);
 
         role.ModifiedByID = 1;

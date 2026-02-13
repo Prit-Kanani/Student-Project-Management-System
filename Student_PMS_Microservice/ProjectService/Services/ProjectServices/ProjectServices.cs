@@ -5,14 +5,18 @@ using ProjectService.Rpository.ProjectRepository;
 
 namespace ProjectService.Services.ProjectServices;
 
-public class ProjectService(
-    IProjectRepository repository 
-    /*, MicroserviceGateway gateway*/
-) : IProjectServices
+public class ProjectService : IProjectServices
 {
     #region CONFIGURATION
 
-    private readonly IProjectRepository _repository = repository;
+    private readonly IProjectRepository _repository;
+    //private readonly MicroserviceGateway _gateway;
+
+    public ProjectService(IProjectRepository repository /*, MicroserviceGateway gateway*/)
+    {  
+        _repository = repository;
+        //_gatway = gatway;
+    }
 
     #endregion
 
@@ -28,7 +32,8 @@ public class ProjectService(
     public async Task<ProjectViewDTO> GetProjectView(int projectID)
     {
         var response = await _repository.GetProjectView(projectID);
-        return response ?? throw new NotFoundException("Project not found");
+        if (response == null) throw new ApiException("Project not found", 404);
+        return response;
     }
     #endregion
 
@@ -36,7 +41,7 @@ public class ProjectService(
     public async Task<ProjectUpdateDTO> GetProjectPK(int projectID)
     {
         var response = await _repository.GetProjectPK(projectID)
-                                        ?? throw new NotFoundException("Project not found");
+                                        ?? throw new ApiException("Project not found", 404);
         return response;
     }
     #endregion
@@ -53,7 +58,7 @@ public class ProjectService(
     public async Task<OperationResultDTO> UpdateProject(ProjectUpdateDTO dto)
     {
         var response = await _repository.UpdateProject(dto)
-                                            ?? throw new NotFoundException("Project not found");
+                                            ?? throw new ApiException("Project not found", 404);
         return response;
     }
     #endregion
@@ -62,7 +67,7 @@ public class ProjectService(
     public async Task<OperationResultDTO> DeactivateProject(int projectID)
     {
         var response = await _repository.DeactivateProject(projectID)
-                                            ?? throw new NotFoundException("Project not found");
+                                            ?? throw new ApiException("Project not found", 404);
         return response;
     }
     #endregion

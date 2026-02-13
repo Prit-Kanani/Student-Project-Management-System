@@ -74,7 +74,7 @@ try
                         Id = "Bearer"
                     }
                 },
-                Array.Empty<string>()
+                new string[] {}
             }
         });
     });
@@ -232,11 +232,13 @@ finally
 
 // Local authorization filter used by the Hangfire dashboard mounting above.
 // Placed at file bottom to avoid changing other files.
-internal class HangfireDashboardAuthorizationFilter(
-    string[] allowedRoles
-) : IDashboardAuthorizationFilter
+internal class HangfireDashboardAuthorizationFilter : IDashboardAuthorizationFilter
 {
-    private readonly string[] _allowedRoles = allowedRoles ?? [];
+    private readonly string[] _allowedRoles;
+    public HangfireDashboardAuthorizationFilter(string[] allowedRoles)
+    {
+        _allowedRoles = allowedRoles ?? [];
+    }
 
     public bool Authorize(DashboardContext context)
     {

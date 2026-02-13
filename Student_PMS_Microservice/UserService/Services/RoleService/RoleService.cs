@@ -6,13 +6,17 @@ using UserService.Repository.RoleRepository;
 
 namespace UserService.Services.RoleService;
 
-public class RoleService(
-    IRoleRepository repository 
-    /*, MicroserviceGateway gateway*/
-) : IRoleService
+public class RoleService : IRoleService
 {
     #region CONFIGURATION
-    private readonly IRoleRepository _repository = repository;
+    private readonly IRoleRepository _repository;
+    //private readonly MicroserviceGateway _gateway;
+
+    public RoleService(IRoleRepository repository /*, MicroserviceGateway gateway*/)
+    {
+        _repository = repository;
+        //_gatway = gatway;
+    }
     #endregion
 
     #region GET ROLES PAGE
@@ -51,7 +55,7 @@ public class RoleService(
     public async Task<OperationResultDTO> UpdateRole(RoleUpdateDTO dto)
     {
         var response = await _repository.UpdateRole(dto);
-        if(response != null) throw new NotFoundException("Role not found");
+        if(response != null) throw new ApiException("Role not found", 404);
         return response;
     }
     #endregion
@@ -60,7 +64,7 @@ public class RoleService(
     public async Task<OperationResultDTO> DeactivateRole(int roleID)
     {
         var response = await _repository.DeactivateRole(roleID);
-        return response ?? throw new NotFoundException("Role not found");
+        return response ?? throw new ApiException("Role not found", 404);
     }
     #endregion
 

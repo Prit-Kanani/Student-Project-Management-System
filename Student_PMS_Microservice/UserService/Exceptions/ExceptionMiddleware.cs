@@ -32,7 +32,7 @@ public class ExceptionMiddleware
         int statusCode = (int)HttpStatusCode.InternalServerError;
         string message = "The API is not working";
 
-        if (ex is ApiException apiEx)
+        if (ex is NotFoundException apiEx)
         {
             statusCode = apiEx.StatusCode;
             message = apiEx.Message;

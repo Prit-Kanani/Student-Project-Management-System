@@ -53,7 +53,7 @@ public class UsersService : IUserService
     public async Task<OperationResultDTO> UpdateUser(UserUpdateDTO dto)
     {
         var result = await _repository.UpdateUser(dto);
-        if(result != null) throw new ApiException("User not found", 404);
+        if(result != null) throw new NotFoundException("User not found");
         return result;
     }
     #endregion
@@ -62,7 +62,7 @@ public class UsersService : IUserService
     public async Task<OperationResultDTO> DeactivateUser(int userID)
     {
         var result = await _repository.DeactivateUser(userID);
-        return result == null ? throw new ApiException("User not found", 404) : result;
+        return result == null ? throw new NotFoundException("User not found") : result;
     }
     #endregion
 

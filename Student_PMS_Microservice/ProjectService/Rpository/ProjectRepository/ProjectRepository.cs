@@ -30,7 +30,7 @@ public class ProjectRepository(
     public async Task<ProjectViewDTO> GetProjectView(int projectID)
     {
         var project = _context.Projects.FirstOrDefaultAsync(p => p.ProjectID == projectID)
-                                        ?? throw new ApiException("Project not found", 404);
+                                        ?? throw new NotFoundException("Project not found");
         var response = ReflectionMapper.Map<ProjectViewDTO>(project);
         return response;
     }
@@ -40,7 +40,7 @@ public class ProjectRepository(
     public async Task<ProjectUpdateDTO> GetProjectPK(int projectID)
     {
         var project = await _context.Projects.FirstOrDefaultAsync(p => p.ProjectID == projectID)
-                                            ?? throw new ApiException("Project not found", 404);
+                                            ?? throw new NotFoundException("Project not found");
         var response = ReflectionMapper.Map<ProjectUpdateDTO>(project);
         return response;
     }
@@ -62,7 +62,7 @@ public class ProjectRepository(
     public async Task<OperationResultDTO> UpdateProject(ProjectUpdateDTO dto)
     {
         var project = await _context.Projects.FirstOrDefaultAsync(p => p.ProjectID == dto.ProjectID)
-                                              ?? throw new ApiException("Project not found", 404);
+                                              ?? throw new NotFoundException("Project not found");
         dto.Adapt(project);
         project.Modified = DateTime.UtcNow;
         var rows = await _context.SaveChangesAsync();
@@ -75,7 +75,7 @@ public class ProjectRepository(
     public async Task<OperationResultDTO> DeactivateProject(int projectID)
     {
         var project = await _context.Projects.FirstOrDefaultAsync(p => p.ProjectID == projectID)
-                                           ?? throw new ApiException("Project not found", 404);
+                                           ?? throw new NotFoundException("Project not found");
         project.IsActive = false;
         project.Modified = DateTime.UtcNow;
         var rows = await _context.SaveChangesAsync();

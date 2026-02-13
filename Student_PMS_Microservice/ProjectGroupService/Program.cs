@@ -92,7 +92,7 @@ app.UseExceptionHandler(builder =>
         }
 
         // 🔹 Your custom API exceptions
-        if (exception is ApiException apiEx)
+        if (exception is NotFoundException apiEx)
         {
             context.Response.StatusCode = apiEx.StatusCode;
 

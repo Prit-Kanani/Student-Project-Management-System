@@ -55,7 +55,7 @@ public class RoleService : IRoleService
     public async Task<OperationResultDTO> UpdateRole(RoleUpdateDTO dto)
     {
         var response = await _repository.UpdateRole(dto);
-        if(response != null) throw new ApiException("Role not found", 404);
+        if(response != null) throw new NotFoundException("Role not found");
         return response;
     }
     #endregion
@@ -64,7 +64,7 @@ public class RoleService : IRoleService
     public async Task<OperationResultDTO> DeactivateRole(int roleID)
     {
         var response = await _repository.DeactivateRole(roleID);
-        return response ?? throw new ApiException("Role not found", 404);
+        return response ?? throw new NotFoundException("Role not found");
     }
     #endregion
 

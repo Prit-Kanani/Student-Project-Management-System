@@ -28,7 +28,7 @@ public class AuthService(
         {
             throw new UnauthorizedException("Invalid credentials");
         }
-        var userInfo =  await UserInfo(dto.Email);
+        var userInfo = await authRepository.UserInfo(dto.Email);
         var token = GenerateToken(userInfo);
         var response = new AuthResponseDTO
         {
@@ -63,14 +63,6 @@ public class AuthService(
         );
 
         return new JwtSecurityTokenHandler().WriteToken(token);
-    }
-    #endregion
-
-    #region USER INFO
-    private async Task<UserInfoDTO> UserInfo(string Email)
-    {
-        var response = await authRepository.UserInfo(Email);
-        return response;
     }
     #endregion
 

@@ -32,6 +32,7 @@ try
     Log.Information("Starting web application");
     #endregion
 
+    #region Builder Configuration
     var builder = WebApplication.CreateBuilder(args);
 
     // Register Serilog as the host logger so required Serilog services (like DiagnosticContext) are available.
@@ -42,6 +43,7 @@ try
 
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
     builder.Services.AddEndpointsApiExplorer();
+    #endregion
 
     #region Swagger with JWT Authentication
     builder.Services.AddSwaggerGen(options =>

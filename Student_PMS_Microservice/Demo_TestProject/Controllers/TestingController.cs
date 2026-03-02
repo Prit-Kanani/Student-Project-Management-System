@@ -40,8 +40,23 @@ public class TestingController(
         authService.Setup(x => x.UserInfo(It.IsAny<string>()))
                    .ReturnsAsync(new UserInfoDTO { Email = "" });
 
-        // use authService.Object where needed
+        var testData = new LoginData();
+        foreach (var data in testData)
+        {
+            var email = data[0].ToString();
+            var password = data[1].ToString();
 
+            // Test Login method
+            var loginResult = await authService.Object.Login(email);
+            Assert.NotNull(loginResult);
+            Assert.Equal(email, loginResult.Email);
+            Assert.Equal("mocked-password", loginResult.Password);
+
+            // Test UserInfo method
+            var userInfoResult = await authService.Object.UserInfo(email);
+            Assert.NotNull(userInfoResult);
+            Assert.IsType<UserInfoDTO>(userInfoResult);
+        }
     }
 }
 public class SampleData : IEnumerable<object[]>
@@ -62,9 +77,6 @@ public class LoginData : IEnumerable<object[]>
 {
     public IEnumerator<object[]> GetEnumerator()
     {
-        yield return new object[] { "", "" };
-        yield return new object[] { "", "" };
-        yield return new object[] { "", "" };
         yield return new object[] { "", "" };
     }
     IEnumerator IEnumerable.GetEnumerator()

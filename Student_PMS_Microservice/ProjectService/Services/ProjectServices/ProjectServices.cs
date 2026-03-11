@@ -32,7 +32,6 @@ public class ProjectService : IProjectServices
     public async Task<ProjectViewDTO> GetProjectView(int projectID)
     {
         var response = await _repository.GetProjectView(projectID);
-        if (response == null) throw new NotFoundException("Project not found");
         return response;
     }
     #endregion
@@ -40,8 +39,7 @@ public class ProjectService : IProjectServices
     #region GET PROJECT PK
     public async Task<ProjectUpdateDTO> GetProjectPK(int projectID)
     {
-        var response = await _repository.GetProjectPK(projectID)
-                                        ?? throw new NotFoundException("Project not found");
+        var response = await _repository.GetProjectPK(projectID);
         return response;
     }
     #endregion
@@ -57,8 +55,7 @@ public class ProjectService : IProjectServices
     #region UPDATE PROJECT
     public async Task<OperationResultDTO> UpdateProject(ProjectUpdateDTO dto)
     {
-        var response = await _repository.UpdateProject(dto)
-                                            ?? throw new NotFoundException("Project not found");
+        var response = await _repository.UpdateProject(dto);
         return response;
     }
     #endregion
@@ -66,8 +63,7 @@ public class ProjectService : IProjectServices
     #region DEACTIVATE USER
     public async Task<OperationResultDTO> DeactivateProject(int projectID)
     {
-        var response = await _repository.DeactivateProject(projectID)
-                                            ?? throw new NotFoundException("Project not found");
+        var response = await _repository.DeactivateProject(projectID);
         return response;
     }
     #endregion

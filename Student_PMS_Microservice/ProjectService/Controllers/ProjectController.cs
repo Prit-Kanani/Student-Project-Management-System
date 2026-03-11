@@ -52,7 +52,7 @@ public class ProjectController(
     [HttpPost]
     [Route("Create")]
     [Produces<OperationResultDTO>]
-    public async Task<IActionResult> CreateProject(ProjectCreateDTO dto)
+    public async Task<IActionResult> CreateProject([FromBody] ProjectCreateDTO dto)
     {
         await insertvalidator.ValidateAndThrowAsync(dto);
         var response = await projectServices.CreateProject(dto);
@@ -61,10 +61,10 @@ public class ProjectController(
     #endregion
 
     #region UPDATE PROJECT
-    [HttpPost]
+    [HttpPut]
     [Route("Update")]
     [Produces<OperationResultDTO>]
-    public async Task<IActionResult> UpdateProject(ProjectUpdateDTO dto)
+    public async Task<IActionResult> UpdateProject([FromBody] ProjectUpdateDTO dto)
     {
         await updatevalidator.ValidateAndThrowAsync(dto);
         var response = await projectServices.UpdateProject(dto);

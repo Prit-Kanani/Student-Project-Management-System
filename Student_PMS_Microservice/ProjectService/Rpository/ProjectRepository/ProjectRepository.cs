@@ -29,8 +29,8 @@ public class ProjectRepository(
     #region GET PROJECT VIEW
     public async Task<ProjectViewDTO> GetProjectView(int projectID)
     {
-        var project = _context.Projects.FirstOrDefaultAsync(p => p.ProjectID == projectID)
-                                        ?? throw new NotFoundException("Project not found");
+        var project = await _context.Projects.FirstOrDefaultAsync(p => p.ProjectID == projectID)
+            ?? throw new NotFoundException("Project not found");
         var response = ReflectionMapper.Map<ProjectViewDTO>(project);
         return response;
     }

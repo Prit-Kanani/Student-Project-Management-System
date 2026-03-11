@@ -9,7 +9,10 @@ Current Scope
   - ProjectService
 
 Priority 1 - Errors
-1. No compile blocker was found inside ApiGateway itself.
+1. Fixed on 2026-03-11:
+   JWT bearer authentication was added to ApiGateway.
+   Ocelot routes now declare AuthenticationOptions with the Bearer provider.
+   Status: ApiGateway build is passing.
 
 Priority 2 - Integration Issues
 1. Gateway route prefix for ProjectGroupService is /api/ProjectGroupService/{everything}, but GroupWiseStudentController inside ProjectGroupService uses api/[controller].
@@ -20,6 +23,9 @@ Priority 2 - Integration Issues
    Impact: End-to-end integration through the gateway is not being tested correctly.
 
 Priority 3 - Tasks
-1. Verify all downstream controllers use route templates consistent with Ocelot downstream path templates.
-2. Add an explicit smoke test path set for gateway-level routing.
-3. Confirm Swagger aggregation works for all downstream services after service route fixes.
+1. Remaining:
+   Verify all downstream controllers use route templates consistent with Ocelot downstream path templates.
+2. Remaining:
+   Add an explicit smoke test path set for gateway-level routing.
+3. Remaining:
+   Confirm Swagger aggregation works for all downstream services after service route fixes.

@@ -25,9 +25,10 @@ Priority 1 - Critical Build And Runtime Blockers
    - ProjectGroupService
    Impact: The code maps Task objects instead of database entities and breaks not-found handling.
 
-4. AuthController returns Ok(Task<AuthResponseDTO>) instead of awaiting the login result.
-   Affected service: UserService
-   Impact: Login response shape is incorrect at runtime.
+4. Fixed on 2026-03-11:
+   UserService auth flow now awaits login correctly and validates JWT configuration.
+   ApiGateway JWT bearer authentication has also been added.
+   Status: Resolved for UserService and ApiGateway.
 
 Priority 2 - Cross-Service Contract And Integration Gaps
 1. Demo_TestProject targets https://localhost:5001/api/UserService/User, but the active launch settings use:

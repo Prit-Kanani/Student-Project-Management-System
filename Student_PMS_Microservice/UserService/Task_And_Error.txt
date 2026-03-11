@@ -3,38 +3,38 @@ Task And Error Notes
 Generated from repository review on 2026-03-11
 
 Priority 1 - High-Risk Runtime Errors
-1. AuthController.Login does not await AuthService.Login.
-   Current behavior returns Ok(Task<AuthResponseDTO>) instead of the actual login response.
-   Impact: Login endpoint behavior is wrong at runtime.
-
-2. JWT settings are read without null checks in startup and auth service code.
-   Impact: Missing or malformed JWT configuration can cause null-reference failures.
+1. Fixed on 2026-03-11:
+   - AuthController.Login now awaits AuthService.Login.
+   - JWT settings are validated during startup and auth service construction.
+   Status: Resolved in code and UserService build is passing.
 
 Priority 2 - Unfinished Features
-1. UserProfileController is empty.
-2. UserProfileService methods return empty DTO/result objects and do not perform any real work.
-3. UserProfileRepository methods return empty DTO/result objects and do not access storage.
-4. UserProfile DTO classes are empty.
-   Impact: The UserProfile feature is scaffolded but not implemented.
+1. Fixed on 2026-03-11:
+   - UserProfileController now exposes endpoints.
+   - UserProfileService now delegates to repository logic.
+   - UserProfileRepository now performs database reads and writes.
+   - UserProfile DTO classes now contain fields.
+   Status: Basic UserProfile CRUD path is implemented.
 
-5. RabbitMQ integration files are fully commented out.
+2. RabbitMQ integration files are fully commented out.
    Impact: Event-driven integration is unfinished.
 
-6. UserMicroservice is only a placeholder with no outbound integration logic.
+3. UserMicroservice is only a placeholder with no outbound integration logic.
    Impact: Intended service-to-service communication is not implemented.
 
 Priority 3 - Logic And Consistency Issues
-1. RoleController injects validators for create and update but does not call them.
-   Impact: Validation is inconsistent compared with UserController.
+1. Fixed on 2026-03-11:
+   - RoleController now applies validators for create and update.
+   - Incorrect not-found logic in UsersService.UpdateUser and RoleService.UpdateRole was corrected.
+   - UserRepository not-found paths were switched to custom API exceptions.
+   Status: Resolved in code.
 
-2. UserRepository throws plain Exception for not-found paths instead of using custom API exceptions.
-   Impact: Error handling consistency is weak.
-
-3. UserRepository.GetUserView may return null and then maps the result directly without explicit not-found handling.
+2. UserRepository.GetUserView may return null and then maps the result directly without explicit not-found handling.
    Impact: Null behavior depends on mapper behavior instead of explicit service logic.
 
-4. AuthRepository constructor takes IConfiguration but does not use it.
-   Impact: Unused dependency indicates incomplete or stale design.
+3. Fixed on 2026-03-11:
+   - AuthRepository no longer takes unused IConfiguration.
+   Status: Resolved in code.
 
 Priority 4 - Quality Issues
 1. There are many nullable warnings across DTOs, models, services, repositories, and Program.cs.
@@ -42,10 +42,11 @@ Priority 4 - Quality Issues
    Impact: This may be leftover/demo code rather than production API behavior.
 
 Priority 5 - Tasks
-1. Make AuthController.Login async and await the service result.
-2. Add strong JWT configuration validation during startup.
-3. Implement or remove the unfinished UserProfile feature.
-4. Re-enable and complete RabbitMQ only if messaging is required.
-5. Apply validators in RoleController create and update paths.
-6. Replace plain Exception usage with service-specific exceptions.
-7. Reduce nullable warnings and review leftover/demo controllers.
+1. Remaining:
+   Re-enable and complete RabbitMQ only if messaging is required.
+2. Remaining:
+   Implement or remove unused UserMicroservice placeholder logic.
+3. Remaining:
+   Reduce nullable warnings and review leftover/demo controllers such as HomeController.
+4. Remaining:
+   Review UserRepository.GetUserView and RoleRepository null-safety warnings for stricter handling.

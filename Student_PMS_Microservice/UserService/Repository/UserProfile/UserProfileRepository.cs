@@ -53,7 +53,7 @@ public class UserProfileRepository(
             throw new BadRequestException("User profile already exists for the supplied UserID");
         }
 
-        var profile = dto.Adapt<UserProfile>();
+        var profile = dto.Adapt<UserService.Models.UserProfile>();
         await context.UserProfile.AddAsync(profile);
         var rows = await context.SaveChangesAsync();
 

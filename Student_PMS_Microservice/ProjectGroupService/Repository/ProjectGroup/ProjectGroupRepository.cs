@@ -1,10 +1,10 @@
 using Comman.DTOs.CommanDTOs;
+using Comman.Exceptions;
 using Comman.Functions;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using ProjectGroupService.DTOs;
-using ProjectGroupService.Exceptions;
 using ProjectGroupServices.Data;
 using System.Text.Json;
 
@@ -36,6 +36,7 @@ public class ProjectGroupRepository(
         {
             AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10)
         };
+
         var serializedData = JsonSerializer.Serialize(response);
         await cache.SetStringAsync(ProjectGroupPageCacheKey, serializedData, cacheOptions);
 

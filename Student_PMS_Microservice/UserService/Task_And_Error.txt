@@ -1,14 +1,22 @@
 UserService
 Task And Error Notes
-Generated from repository review on 2026-03-11
+Updated on 2026-03-11
 
-Priority 1 - High-Risk Runtime Errors
+Priority 1 - Completed High-Risk Fixes
 1. Fixed on 2026-03-11:
    - AuthController.Login now awaits AuthService.Login.
    - JWT settings are validated during startup and auth service construction.
-   Status: Resolved in code and UserService build is passing.
+   Status: Resolved in code.
 
-Priority 2 - Unfinished Features
+2. Fixed on 2026-03-11:
+   - Shared exception handling now uses Comman exceptions instead of service-local ApiException copies.
+   Status: Resolved in code.
+
+3. Fixed on 2026-03-11:
+   - UserService now exposes audit-name resolution for CreatedByID, ModifiedByID, and ApprovedByID through UserController.
+   Status: Implemented for downstream service use.
+
+Priority 2 - Completed Feature Work
 1. Fixed on 2026-03-11:
    - UserProfileController now exposes endpoints.
    - UserProfileService now delegates to repository logic.
@@ -16,44 +24,24 @@ Priority 2 - Unfinished Features
    - UserProfile DTO classes now contain fields.
    Status: Basic UserProfile CRUD path is implemented.
 
-2. RabbitMQ integration files are fully commented out.
+2. Fixed on 2026-03-11:
+   - The unused UserMicroservice placeholder file was removed.
+   Status: Resolved in code.
+
+Priority 3 - Remaining Work
+1. RabbitMQ integration files are fully commented out.
    Impact: Event-driven integration is unfinished.
 
-3. UserMicroservice is only a placeholder with no outbound integration logic.
-   Impact: Intended service-to-service communication is not implemented.
-   Clarification needed before implementation:
-   - Should UserService call ProjectGroupService, ProjectService, or both?
-   - Is the existing CreatedAndModifiedBy endpoint meant for cross-service use?
-   - Should UserService expose only identity/user lookup data, or also role/profile-related composite data?
-   - Should outbound calls go through ApiGateway or direct service URLs from MicroserviceUrls?
+2. UserRepository.GetUserView may still depend on mapper behavior after read-time null handling.
+   Impact: This path should be reviewed again when builds can be re-verified.
 
-Priority 3 - Logic And Consistency Issues
-1. Fixed on 2026-03-11:
-   - RoleController now applies validators for create and update.
-   - Incorrect not-found logic in UsersService.UpdateUser and RoleService.UpdateRole was corrected.
-   - UserRepository not-found paths were switched to custom API exceptions.
-   Status: Resolved in code.
+3. UserService still contains leftover/demo-style code such as HomeController.
+   Impact: This may not belong in the final service surface.
 
-2. UserRepository.GetUserView may return null and then maps the result directly without explicit not-found handling.
-   Impact: Null behavior depends on mapper behavior instead of explicit service logic.
+Priority 4 - Environment Note
+1. Fresh build verification after the latest changes is blocked in this environment because NuGet restore cannot reach api.nuget.org.
 
-3. Fixed on 2026-03-11:
-   - AuthRepository no longer takes unused IConfiguration.
-   Status: Resolved in code.
-
-Priority 4 - Quality Issues
-1. There are many nullable warnings across DTOs, models, services, repositories, and Program.cs.
-2. UserService contains a HomeController with a basic Add action that does not appear related to the service domain.
-   Impact: This may be leftover/demo code rather than production API behavior.
-
-Priority 5 - Tasks
-1. Remaining:
-   Re-enable and complete RabbitMQ only if messaging is required.
-2. Remaining:
-   Implement or remove unused UserMicroservice placeholder logic.
-3. Remaining:
-   Reduce nullable warnings and review leftover/demo controllers such as HomeController.
-4. Remaining:
-   Review UserRepository.GetUserView and RoleRepository null-safety warnings for stricter handling.
-5. Remaining:
-   Define the intended UserService outbound integration contract before implementing UserMicroservice.
+Suggested Next Steps
+1. Re-run `dotnet build UserService/UserService.csproj` in a network-enabled environment.
+2. Decide whether RabbitMQ is required; if not, remove the commented integration files.
+3. Review HomeController and any other leftover demo-only endpoints for removal.

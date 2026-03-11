@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+using Comman.Exceptions;
+using Newtonsoft.Json;
 using System.Net;
 
 namespace UserService.Exceptions;
@@ -19,15 +20,13 @@ public class ExceptionMiddleware(RequestDelegate next)
         }
     }
 
-    // ✅ NOW private is valid
     private static async Task HandleExceptionAsync(HttpContext context, Exception ex)
     {
         context.Response.ContentType = "application/json";
 
-        int statusCode = (int)HttpStatusCode.InternalServerError;
-        string message = "The API is not working";
+        var statusCode = (int)HttpStatusCode.InternalServerError;
+        var message = "The API is not working";
 
-        // If the exception inherits from ApiException use its status code and message
         if (ex is ApiException apiEx)
         {
             statusCode = apiEx.StatusCode;

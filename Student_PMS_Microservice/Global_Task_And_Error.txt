@@ -1,75 +1,60 @@
 Student PMS Microservice
 Global Tasks And Errors
-Generated from repository review on 2026-03-11
+Updated on 2026-03-11
 
 Purpose
 - This file tracks cross-project and service-to-service issues across the full microservice solution.
 - Project-specific details are stored in each project's Task_And_Error.txt file.
 
-Priority 1 - Current Global Status
+Priority 1 - Cross-Service Work Completed
 1. Fixed on 2026-03-11:
-   The full solution now builds successfully.
-   Resolved items included:
-   - Demo_TestProject compile blockers
-   - ProjectService DI registration issues
-   - Broken async repository reads in ProjectService and ProjectGroupService
-   - UserService auth flow and JWT configuration checks
-   - ApiGateway JWT bearer authentication
-   Status: Resolved in code and verified by full solution build.
-
-Priority 2 - Cross-Service Contract And Integration Gaps
-1. Fixed on 2026-03-11:
-   Demo_TestProject now targets the ApiGateway URL instead of the old localhost:5001 address.
-   Status: Resolved in code.
+   ProjectService now resolves CreatedByID and ModifiedByID display names by calling UserService.
+   Status: Implemented in code through ProjectService/Services/External/UserServiceClient.cs and ProjectService service layer.
 
 2. Fixed on 2026-03-11:
-   Demo_TestProject now uses ListResult<T>.Items instead of Data.
-   Status: Resolved in code.
+   ProjectGroupService now resolves CreatedByID, ModifiedByID, and ApprovedByID display names by calling UserService.
+   Status: Implemented in code through ProjectGroupService/Services/External/UserServiceClient.cs and service layer enrichment.
 
 3. Fixed on 2026-03-11:
-   GroupWiseStudentController route now aligns with the API Gateway route prefix.
-   Status: Resolved in code.
+   ProjectGroupService now validates ProjectID by calling ProjectService before create and update flows in ProjectGroupByProject.
+   Status: Implemented in code through ProjectGroupService/Services/External/ProjectServiceClient.cs.
 
-4. ProjectGroupByProject deactivation still uses a hardcoded ModifiedByID = 1 instead of user identity from JWT.
-   Status: Resolved on 2026-03-11.
+4. Fixed on 2026-03-11:
+   Shared API exception types were moved into Comman and reused across services.
+   Status: Implemented in code through Comman/Exceptions/ApiException.cs.
 
-Priority 3 - Unfinished Service-To-Service Features
-1. Cross-service HTTP client placeholders exist but contain no actual integration logic.
-   Affected files:
+5. Fixed on 2026-03-11:
+   Confirmed-unused placeholder microservice client files and other dead code were removed.
+   Removed items:
    - UserService/Services/UserService/UserMicroservice.cs
    - ProjectService/Services/ProjectServices/ProjectMicroservices.cs
    - ProjectGroupService/Services/ProjectGroupServices/ProjectMicroservices.cs
-   Impact: Intended service-to-service communication is not implemented.
-   Clarification needed before implementation:
-   - Which service should call which downstream service?
-   - Which endpoints should be called?
-   - Which DTOs should be exchanged?
-   - Should calls go direct to services or through ApiGateway?
-   - Should JWT bearer tokens be forwarded on outbound calls?
+   - Comman/Functions/OptionMapper.cs
+   - ProjectGroupService/Services/ProjectGroupByProject/Validation/InsertProjectGroupByProjectValidation.cs
 
-2. RabbitMQ integration is present only as commented-out code.
+Priority 2 - Current Environment Limitation
+1. Build verification is currently blocked in this execution environment because NuGet restore cannot reach https://api.nuget.org/v3/index.json.
+   Observed on 2026-03-11 while running dotnet build for:
+   - UserService/UserService.csproj
+   - ProjectService/ProjectService.csproj
+   - ProjectGroupService/ProjectGroupService.csproj
+   Impact: Code changes were applied, but a fresh build could not be fully re-verified in this sandbox after the latest edits.
+
+Priority 3 - Remaining Global Work
+1. RabbitMQ integration is still present only as commented-out code.
    Affected files:
    - UserService/RabbitMQ/GlobalMessageSubscriber.cs
    - UserService/RabbitMQ/MessageBusClient.cs
    Impact: Messaging/event-driven integration is unfinished.
 
-3. UserProfile feature was scaffolded but is now implemented as a basic CRUD path in UserService.
-   Status: Resolved on 2026-03-11.
-
-Priority 4 - Quality And Consistency Issues
-1. Several repositories originally threw plain Exception instead of service-specific API exceptions.
-   Status: Improved in the fixed services; continue reviewing any future additions for consistency.
-
-2. Fixed on 2026-03-11:
-   Nullable reference warnings across Comman, UserService, ProjectService, and ProjectGroupService were cleaned up.
-   Status: Full solution build now passes with 0 warnings and 0 errors.
-
-3. Some controllers and endpoints still have inconsistent validation coverage.
+2. Some controllers and endpoints still have inconsistent validation coverage.
    Impact: Validation behavior is not yet fully standardized across all services.
 
+3. Demo_TestProject integration tests are still environment-dependent and skipped by default.
+   Impact: Cross-service behavior is not yet verified by a controlled automated integration setup.
+
 Suggested Fix Order
-1. Replace remaining placeholder cross-service HTTP client classes with real integrations or remove them.
+1. Re-run restore/build in an environment with NuGet access and verify the latest cross-service changes.
 2. Decide whether RabbitMQ is required; if yes, implement it fully, otherwise remove dead code.
-3. Replace environment-dependent skipped integration tests with controlled integration infrastructure.
-4. Standardize validation coverage across the remaining endpoints where validators are still absent.
-5. Before implementing any cross-service HTTP client, define the intended workflow in the relevant project task file to avoid building the wrong integration.
+3. Standardize validation coverage across remaining endpoints.
+4. Replace skipped environment-dependent integration tests with controlled integration infrastructure.

@@ -1,11 +1,11 @@
 using Comman.DTOs.CommanDTOs;
+using Comman.Exceptions;
 using Comman.Functions;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using UserService.DTOs;
-using UserService.Exceptions;
 using UserService.Repository.Auth;
 
 namespace UserService.Services.Auth;

@@ -1,10 +1,10 @@
 using Comman.DTOs.CommanDTOs;
+using Comman.Exceptions;
 using Comman.Functions;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 using ProjectGroup.Data;
 using UserService.DTOs;
-using UserService.Exceptions;
 using UserService.Models;
 
 namespace UserService.Repository.UserProfile;

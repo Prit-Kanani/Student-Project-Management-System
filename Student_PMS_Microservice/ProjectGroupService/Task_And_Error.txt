@@ -1,8 +1,8 @@
 ProjectGroupService
 Task And Error Notes
-Generated from repository review on 2026-03-11
+Updated on 2026-03-11
 
-Priority 1 - High-Risk Logic Errors
+Priority 1 - Completed Logic Fixes
 1. Fixed on 2026-03-11:
    ProjectGroupRepository.GetProjectGroupView now awaits FirstOrDefaultAsync correctly.
    Status: Resolved in code.
@@ -19,41 +19,36 @@ Priority 1 - High-Risk Logic Errors
    ProjectGroupByProjectRepository now uses single-record Dapper reads for view/PK fetches.
    Status: Resolved in code.
 
-Priority 2 - Routing And API Contract Issues
+Priority 2 - Completed Cross-Service Integration
 1. Fixed on 2026-03-11:
-   GroupWiseStudentController route now uses api/ProjectGroupService/[controller].
-   Status: Resolved in code.
+   ProjectGroupService now calls UserService to resolve CreatedByID, ModifiedByID, and ApprovedByID names for view responses.
+   Status: Implemented in code through Services/External/UserServiceClient.cs and service layer enrichment.
 
 2. Fixed on 2026-03-11:
-   ProjectGroupController delete route now uses "Deactivate/{id}" for consistency.
-   Status: Resolved in code.
+   ProjectGroupService now calls ProjectService to validate ProjectID before create and update flows in ProjectGroupByProject.
+   Status: Implemented in code through Services/External/ProjectServiceClient.cs.
 
-Priority 3 - Unfinished Work
-1. ProjectMicroservices.cs is only a placeholder with no integration logic.
-   Clarification needed before implementation:
-   - Should ProjectGroupService call ProjectService to validate ProjectID or fetch project metadata?
-   - Should it call UserService to resolve CreatedBy/ModifiedBy/ApprovedBy names?
-   - Which responses should include enriched downstream data versus local IDs only?
-
-2. Fixed on 2026-03-11:
-   ProjectGroupService now has JWT authentication configured and ProjectGroupByProject deactivation reads ModifiedByID from authenticated user claims.
-   Status: Resolved in code.
-
-Priority 4 - Quality Issues
-1. Multiple DTOs and models generate nullable warnings.
-2. Fixed on 2026-03-11:
-   Several "Studnet" error messages were corrected to "Student group".
-   Status: Partially resolved in code.
 3. Fixed on 2026-03-11:
-   ProjectGroupRepository now invalidates the page cache on create, update, and deactivate.
+   JWT authentication is configured and ProjectGroupByProject deactivation reads ModifiedByID from authenticated user claims.
    Status: Resolved in code.
 
-Priority 5 - Tasks
-1. Remaining:
-   Implement or remove unused ProjectMicroservices placeholder code.
-2. Remaining:
-   Reduce nullable warnings in DTOs and models.
-3. Remaining:
-   Review whether create/update GroupWiseStudent endpoints also need explicit validation classes for parity with ProjectGroup endpoints.
-4. Remaining:
-   Define the intended ProjectGroupService downstream contract before implementing ProjectMicroservices.
+4. Fixed on 2026-03-11:
+   The unused ProjectMicroservices placeholder file and empty validation placeholder file were removed.
+   Status: Resolved in code.
+
+5. Fixed on 2026-03-11:
+   Shared API exception handling now uses Comman exceptions instead of service-local ApiException copies.
+   Status: Resolved in code.
+
+Priority 3 - Remaining Work
+1. Review whether create/update GroupWiseStudent endpoints also need explicit validation classes for parity with ProjectGroup endpoints.
+
+2. ProjectGroupController delete route behavior should remain documented as a soft delete if that is the intended contract.
+
+Priority 4 - Environment Note
+1. Fresh build verification after the latest changes is blocked in this environment because NuGet restore cannot reach api.nuget.org.
+
+Suggested Next Steps
+1. Re-run `dotnet build ProjectGroupService/ProjectGroupService.csproj` in a network-enabled environment.
+2. Add or confirm GroupWiseStudent validation if you want parity with the other slices.
+3. Decide whether additional downstream enrichment is needed beyond user names and ProjectID validation.

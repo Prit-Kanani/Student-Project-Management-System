@@ -1,16 +1,12 @@
-﻿using Newtonsoft.Json;
+using Comman.Exceptions;
+using Newtonsoft.Json;
 using System.Net;
 
 namespace ProjectService.Exceptions;
 
-public class ExceptionMiddleware
+public class ExceptionMiddleware(RequestDelegate next)
 {
-    private readonly RequestDelegate _next;
-
-    public ExceptionMiddleware(RequestDelegate next)
-    {
-        _next = next;
-    }
+    private readonly RequestDelegate _next = next;
 
     public async Task InvokeAsync(HttpContext context)
     {
@@ -24,15 +20,14 @@ public class ExceptionMiddleware
         }
     }
 
-    // ✅ NOW private is valid
     private static async Task HandleExceptionAsync(HttpContext context, Exception ex)
     {
         context.Response.ContentType = "application/json";
 
-        int statusCode = (int)HttpStatusCode.InternalServerError;
-        string message = "The API is not working";
+        var statusCode = (int)HttpStatusCode.InternalServerError;
+        var message = "The API is not working";
 
-        if (ex is NotFoundException apiEx)
+        if (ex is ApiException apiEx)
         {
             statusCode = apiEx.StatusCode;
             message = apiEx.Message;

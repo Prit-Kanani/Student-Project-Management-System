@@ -1,0 +1,85 @@
+Student PMS Microservice
+Global Tasks And Errors
+Generated from repository review on 2026-03-11
+
+Purpose
+- This file tracks cross-project and service-to-service issues across the full microservice solution.
+- Project-specific details are stored in each project's Task_And_Error.txt file.
+
+Priority 1 - Critical Build And Runtime Blockers
+1. Solution build is failing because Demo_TestProject uses HttpContent.ReadAsAsync(...), but the current test project setup does not provide that API.
+   Affected project: Demo_TestProject
+   Impact: Full solution does not build.
+
+2. ProjectService has controller dependencies that are not registered in DI.
+   Missing registrations include:
+   - IProjectServices
+   - IProjectRepository
+   - InsertValidation
+   - UpdateValidation
+   Impact: ProjectService controller activation will fail at runtime.
+
+3. Multiple repositories have incorrect async usage in "View" methods.
+   Affected services:
+   - ProjectService
+   - ProjectGroupService
+   Impact: The code maps Task objects instead of database entities and breaks not-found handling.
+
+4. AuthController returns Ok(Task<AuthResponseDTO>) instead of awaiting the login result.
+   Affected service: UserService
+   Impact: Login response shape is incorrect at runtime.
+
+Priority 2 - Cross-Service Contract And Integration Gaps
+1. Demo_TestProject targets https://localhost:5001/api/UserService/User, but the active launch settings use:
+   - UserService: https://localhost:7165
+   - ApiGateway: https://localhost:7095
+   Impact: Integration tests point to the wrong host and port.
+
+2. Demo_TestProject expects ListResult<T>.Data, but the shared DTO exposes ListResult<T>.Items.
+   Affected projects:
+   - Demo_TestProject
+   - Comman
+   Impact: Even after compile fixes, test assertions do not match the actual API contract.
+
+3. GroupWiseStudentController route pattern does not align with the API Gateway route prefix.
+   Current controller route: api/[controller]
+   Gateway route prefix: /api/ProjectGroupService/{everything}
+   Impact: GroupWiseStudent endpoints are inconsistent with the rest of ProjectGroupService and are not aligned with gateway expectations.
+
+4. ProjectGroupByProject deactivation still uses a hardcoded ModifiedByID = 1 instead of user identity from JWT.
+   Impact: Cross-service audit/user identity propagation is not implemented.
+
+Priority 3 - Unfinished Service-To-Service Features
+1. Cross-service HTTP client placeholders exist but contain no actual integration logic.
+   Affected files:
+   - UserService/Services/UserService/UserMicroservice.cs
+   - ProjectService/Services/ProjectServices/ProjectMicroservices.cs
+   - ProjectGroupService/Services/ProjectGroupServices/ProjectMicroservices.cs
+   Impact: Intended service-to-service communication is not implemented.
+
+2. RabbitMQ integration is present only as commented-out code.
+   Affected files:
+   - UserService/RabbitMQ/GlobalMessageSubscriber.cs
+   - UserService/RabbitMQ/MessageBusClient.cs
+   Impact: Messaging/event-driven integration is unfinished.
+
+3. UserProfile feature is scaffolded but not implemented.
+   Impact: UserService contains an incomplete domain area that is not production-ready.
+
+Priority 4 - Quality And Consistency Issues
+1. Several repositories throw plain Exception instead of service-specific API exceptions.
+   Impact: Error handling is inconsistent across services.
+
+2. There are many nullable reference warnings across Comman, UserService, ProjectService, and ProjectGroupService.
+   Impact: Increased risk of null-reference failures and weak model validation.
+
+3. Some controllers inject validators but do not use them consistently.
+   Impact: Validation behavior is inconsistent across endpoints.
+
+Suggested Fix Order
+1. Fix Demo_TestProject compile errors so the solution builds again.
+2. Fix ProjectService DI registration so its endpoints can start.
+3. Fix incorrect async repository code in ProjectService and ProjectGroupService.
+4. Fix UserService auth controller login flow.
+5. Repair gateway/controller route mismatches and test host assumptions.
+6. Implement unfinished UserProfile, service-to-service HTTP clients, and RabbitMQ only after blockers are removed.

@@ -3,14 +3,9 @@ using System.Net;
 
 namespace UserService.Exceptions;
 
-public class ExceptionMiddleware
+public class ExceptionMiddleware(RequestDelegate next)
 {
-    private readonly RequestDelegate _next;
-
-    public ExceptionMiddleware(RequestDelegate next)
-    {
-        _next = next;
-    }
+    private readonly RequestDelegate _next = next;
 
     public async Task InvokeAsync(HttpContext context)
     {
@@ -32,7 +27,8 @@ public class ExceptionMiddleware
         int statusCode = (int)HttpStatusCode.InternalServerError;
         string message = "The API is not working";
 
-        if (ex is NotFoundException apiEx)
+        // If the exception inherits from ApiException use its status code and message
+        if (ex is ApiException apiEx)
         {
             statusCode = apiEx.StatusCode;
             message = apiEx.Message;

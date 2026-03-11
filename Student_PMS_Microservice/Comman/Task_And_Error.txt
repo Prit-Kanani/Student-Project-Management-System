@@ -1,0 +1,24 @@
+Comman
+Task And Error Notes
+Generated from repository review on 2026-03-11
+
+Current Scope
+- Shared DTOs and helper mappers used across services.
+
+Priority 1 - Errors
+1. No compile blocker was found inside Comman itself.
+
+Priority 2 - Shared Contract Issues
+1. ListResult<T> exposes:
+   - TotalCount
+   - Items
+   But Demo_TestProject expects a Data property.
+   Impact: Shared response contract and tests are currently inconsistent.
+
+2. JwtSettings properties are non-nullable and currently generate nullable warnings.
+   Impact: Misconfiguration can lead to runtime null-reference failures in services that bind JWT settings.
+
+Priority 3 - Tasks
+1. Decide whether ListResult<T> should keep Items or switch to a different response property name.
+2. Tighten DTO nullability using required or nullable reference types where appropriate.
+3. Review ReflectionMapper assumptions for list wrappers and single-item mapping to ensure all consumers match the shared DTO contract.

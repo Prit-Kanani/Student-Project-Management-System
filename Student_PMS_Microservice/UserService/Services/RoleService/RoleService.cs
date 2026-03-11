@@ -55,7 +55,6 @@ public class RoleService : IRoleService
     public async Task<OperationResultDTO> UpdateRole(RoleUpdateDTO dto)
     {
         var response = await _repository.UpdateRole(dto);
-        if(response != null) throw new NotFoundException("Role not found");
         return response;
     }
     #endregion

@@ -1,0 +1,43 @@
+ProjectGroupService
+Task And Error Notes
+Generated from repository review on 2026-03-11
+
+Priority 1 - High-Risk Logic Errors
+1. ProjectGroupRepository.GetProjectGroupView does not await FirstOrDefaultAsync.
+   Impact: It maps a Task instead of the entity and breaks not-found handling.
+
+2. GroupWiseStudentRepository.GetGroupWiseStudentView does not await FirstOrDefaultAsync.
+   Impact: It maps a Task instead of the entity and breaks not-found handling.
+
+3. GroupWiseStudentRepository.DeactivateGroupWiseStudent returns ProjectGroupID as OperationResultDTO.Id instead of StudentWiseGroupID.
+   Impact: API response contains the wrong record identifier.
+
+4. ProjectGroupByProjectRepository uses QueryAsync<T> for single-record view/PK fetches and checks for null even though QueryAsync returns an enumerable.
+   Impact: Not-found behavior is incorrect and mapping is unreliable for single-item reads.
+
+Priority 2 - Routing And API Contract Issues
+1. GroupWiseStudentController route is api/[controller] instead of api/ProjectGroupService/[controller].
+   Impact: This controller is inconsistent with the other controllers in the same service and with gateway routing.
+
+2. ProjectGroupController uses DELETE route name "Delete/{id}" while ProjectGroupByProjectController uses "Deactivate/{id}".
+   Impact: API naming is inconsistent across related resources.
+
+Priority 3 - Unfinished Work
+1. ProjectMicroservices.cs is only a placeholder with no integration logic.
+
+2. ProjectGroupByProject deactivation still uses hardcoded ModifiedByID = 1.
+   Impact: JWT/user identity propagation is unfinished.
+
+Priority 4 - Quality Issues
+1. Multiple DTOs and models generate nullable warnings.
+2. Several user-facing error messages contain typos such as "Studnet".
+3. Redis caching exists for ProjectGroup page reads, but cache invalidation is missing for create, update, and deactivate operations in ProjectGroupRepository.
+   Impact: Cached page results can become stale after writes.
+
+Priority 5 - Tasks
+1. Fix async query handling in ProjectGroupRepository and GroupWiseStudentRepository.
+2. Fix single-record Dapper read patterns in ProjectGroupByProjectRepository.
+3. Align GroupWiseStudent routes with the rest of ProjectGroupService and the API Gateway.
+4. Replace hardcoded ModifiedByID with authenticated user context.
+5. Add cache invalidation for ProjectGroup page writes.
+6. Clean up typos and nullable warnings.

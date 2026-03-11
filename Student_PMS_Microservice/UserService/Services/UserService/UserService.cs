@@ -53,7 +53,6 @@ public class UsersService : IUserService
     public async Task<OperationResultDTO> UpdateUser(UserUpdateDTO dto)
     {
         var result = await _repository.UpdateUser(dto);
-        if(result != null) throw new NotFoundException("User not found");
         return result;
     }
     #endregion

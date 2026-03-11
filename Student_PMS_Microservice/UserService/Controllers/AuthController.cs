@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using UserService.DTOs;
 using UserService.Services.Auth;
 
@@ -7,20 +7,13 @@ namespace UserService.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 public class AuthController(
-    IAuthService AuthService
+    IAuthService authService
 ) : ControllerBase
 {
-    #region Constructor
-    private readonly IAuthService AuthService = AuthService;
-    #endregion
-
-    #region Login
     [HttpPost("login")]
-    public IActionResult Login([FromBody] LoginDTO request)
+    public async Task<IActionResult> Login([FromBody] LoginDTO request)
     {
-        var response = AuthService.Login(request);
+        var response = await authService.Login(request);
         return Ok(response);
     }
-    #endregion
-
 }

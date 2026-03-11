@@ -1,4 +1,6 @@
-﻿using Comman.DTOs.CommanDTOs;
+﻿#region Using directives
+
+using Comman.DTOs.CommanDTOs;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +12,7 @@ using ProjectGroup.Services.UserService;
 using ProjectGroup.Validations;
 using Serilog;
 using System.Text;
+using System.Threading.RateLimiting; // <-- for rate limiting implementations
 using UserService.Exceptions;
 using UserService.Repository.Auth;
 using UserService.Repository.RoleRepository;
@@ -20,6 +23,9 @@ using UserService.Services.RoleService;
 using UserService.Services.UserProfile;
 using UserService.Services.UserService;
 
+#endregion
+
+#region Try and Catch
 try
 {
     #region Serilog Configuration
@@ -105,9 +111,98 @@ try
 
     #endregion
 
+    #region Rate Limiting Configuration
+    // ----------------------------------------------------------------
+    // Rate limiting options (two implementations provided). Both blocks
+    // are commented out so you can enable one at a time to test.
+    // ----------------------------------------------------------------
+
+    // -----------------------------
+    // Fixed window implementation
+    // -----------------------------
+    // Uncomment the following block to enable a fixed-window rate limiter.
+    // This applies a per-IP fixed window with 10 permits per 60 seconds.
+    /*
+    builder.Services.AddRateLimiter(options =>
+    {
+        options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+        {
+            var ip = httpContext.Connection.RemoteIpAddress?.ToString() ?? "anonymous";
+            return RateLimitPartition.GetFixedWindowLimiter(ip, _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 10,
+                Window = TimeSpan.FromSeconds(60),
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 0
+            });
+        });
+
+        options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+        // Optional: Customize the response body when rejected
+        options.OnRejected = async (context, cancellationToken) =>
+        {
+            context.HttpContext.Response.ContentType = "application/json";
+            context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+            var payload = new { StatusCode = 429, Message = "Too many requests - fixed window" };
+            await context.HttpContext.Response.WriteAsJsonAsync(payload, cancellationToken);
+        };
+    });
+    */
+
+    // -----------------------------
+    // Token-bucket implementation
+    // -----------------------------
+    // Uncomment the following block to enable a token-bucket rate limiter.
+    // This applies a per-IP token bucket with a burst of 20 tokens and
+    // replenishes 1 token per second.
+
+    builder.Services.AddRateLimiter(options =>
+    {
+        options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+        {
+            var ip = httpContext.Connection.RemoteIpAddress?.ToString() ?? "anonymous";
+            return RateLimitPartition.GetTokenBucketLimiter(ip, _ => new TokenBucketRateLimiterOptions
+            {
+                TokenLimit = 5,
+                TokensPerPeriod = 1,
+                ReplenishmentPeriod = TimeSpan.FromSeconds(1),
+                AutoReplenishment = true,
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 0
+            });
+        });
+
+        options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+        // Optional: Customize the response body when rejected
+        options.OnRejected = async (context, cancellationToken) =>
+        {
+            context.HttpContext.Response.ContentType = "application/json";
+            context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+            var payload = new { StatusCode = 429, Message = "Too many requests - token bucket" };
+            await context.HttpContext.Response.WriteAsJsonAsync(payload, cancellationToken);
+        };
+    });
+
+
+    // Note: When you enable one of the above, also uncomment the
+    // corresponding middleware call in the pipeline below: app.UseRateLimiter();
+
+    #endregion
+
     #region JWT Authentication
 
-    var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>();
+    var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>()
+        ?? throw new InvalidOperationException("Jwt configuration section is missing.");
+
+    if (string.IsNullOrWhiteSpace(jwtSettings.SecretKey) ||
+        string.IsNullOrWhiteSpace(jwtSettings.Issuer) ||
+        string.IsNullOrWhiteSpace(jwtSettings.Audience))
+    {
+        throw new InvalidOperationException("Jwt configuration is incomplete.");
+    }
+
     var key = Encoding.UTF8.GetBytes(jwtSettings.SecretKey);
 
     builder.Services.AddAuthentication(options =>
@@ -131,6 +226,7 @@ try
     });
     #endregion
 
+    #region App configuration and middleware
     var app = builder.Build();
 
     // request logging middleware depends on Serilog services registered above
@@ -147,6 +243,9 @@ try
         });
     }
 
+    // When enabling rate limiting, uncomment the following line to activate the middleware.
+     app.UseRateLimiter();
+
     app.UseMiddleware<ExceptionMiddleware>();
 
     app.UseHttpsRedirection();
@@ -157,6 +256,7 @@ try
     app.MapControllers();
 
     app.Run();
+    #endregion
 }
 catch (Exception ex)
 {
@@ -166,3 +266,4 @@ finally
 {
     Log.CloseAndFlush();
 }
+#endregion

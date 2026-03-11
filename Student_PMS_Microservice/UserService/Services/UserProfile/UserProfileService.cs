@@ -1,35 +1,35 @@
-﻿using Comman.DTOs.CommanDTOs;
+using Comman.DTOs.CommanDTOs;
 using UserService.DTOs;
+using UserService.Repository.UserProfile;
 
 namespace UserService.Services.UserProfile;
 
 public class UserProfileService(
-
-)   : IUserProfileService
+    IUserProfileRepository repository
+) : IUserProfileService
 {
     public async Task<ListResult<UserProfileListDTO>> GetUserProfilePage()
     {
-        var response = new ListResult<UserProfileListDTO>();
-        return response;
+        return await repository.GetUserProfilePage();
     }
+
     public async Task<UserProfileViewDTO> GetUserProfileView(int userID)
     {
-        var response = new UserProfileViewDTO();
-        return response;
+        return await repository.GetUserProfileView(userID);
     }
+
     public async Task<UserProfileUpdateDTO> GetUserProfilePK(int userID)
     {
-        var response = new UserProfileUpdateDTO();
-        return response;
+        return await repository.GetUserProfilePK(userID);
     }
+
     public async Task<OperationResultDTO> CreateUserProfile(UserProfileCreateDTO dto)
     {
-        var response = new OperationResultDTO();
-        return response;
+        return await repository.CreateUserProfile(dto);
     }
+
     public async Task<OperationResultDTO> UpdateUserProfile(UserProfileUpdateDTO dto)
     {
-        var response = new OperationResultDTO();
-        return response;
+        return await repository.UpdateUserProfile(dto);
     }
 }

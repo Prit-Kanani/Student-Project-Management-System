@@ -71,6 +71,7 @@ public class RoleController(
     [Produces<OperationResultDTO>]
     public async Task<IActionResult> CreateRole([FromBody] RoleCreateDTO dto)
     {
+        await _create.ValidateAndThrowAsync(dto);
         var response = await _roleService.CreateRole(dto);
         return Ok(response);
     }
@@ -82,6 +83,7 @@ public class RoleController(
     [Produces<OperationResultDTO>]
     public async Task<IActionResult> UpdateRole([FromBody] RoleUpdateDTO dto)
     {
+        await _update.ValidateAndThrowAsync(dto);
         var response = await _roleService.UpdateRole(dto);
         return Ok(response);
     }

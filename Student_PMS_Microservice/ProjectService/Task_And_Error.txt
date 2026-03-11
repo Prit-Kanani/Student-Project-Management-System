@@ -1,0 +1,37 @@
+ProjectService
+Task And Error Notes
+Generated from repository review on 2026-03-11
+
+Priority 1 - Critical Runtime Errors
+1. Program.cs does not register required dependencies for ProjectController.
+   Missing registrations:
+   - IProjectServices
+   - IProjectRepository
+   - InsertValidation
+   - UpdateValidation
+   Impact: Requests to ProjectController will fail at runtime because DI cannot build the controller.
+
+Priority 2 - Logic Errors
+1. ProjectRepository.GetProjectView does not await FirstOrDefaultAsync.
+   Impact: The method maps a Task instead of a Project entity and the not-found check is ineffective.
+
+2. ProjectController uses POST for Update instead of PUT.
+   Impact: API semantics are inconsistent.
+
+3. DeactivateProject uses Delete in the controller but performs a soft delete by setting IsActive = false.
+   Impact: Behavior is valid, but should be documented consistently as a soft delete.
+
+Priority 3 - Unfinished Work
+1. ProjectMicroservices.cs is only a placeholder with HttpClient and IConfiguration fields.
+   Impact: Planned cross-service communication is not implemented.
+
+Priority 4 - Quality Issues
+1. DTOs and model classes generate nullable warnings for ProjectName and related properties.
+2. Startup configuration is minimal compared with UserService and lacks validation registration consistency.
+
+Priority 5 - Tasks
+1. Register the service, repository, and validators in Program.cs.
+2. Fix async query handling in ProjectRepository.GetProjectView.
+3. Decide whether update should use PUT for consistency.
+4. Implement or remove unused cross-service placeholder code.
+5. Reduce nullable warnings in DTOs and models.

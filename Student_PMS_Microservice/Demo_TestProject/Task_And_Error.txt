@@ -1,0 +1,36 @@
+Demo_TestProject
+Task And Error Notes
+Generated from repository review on 2026-03-11
+
+Priority 1 - Critical Errors
+1. The solution build fails in this project because IntegrationTesting.cs uses HttpContent.ReadAsAsync(...), which is unavailable with the current project references.
+   Impact: Full solution build fails.
+
+2. IntegrationTesting.cs contains many repeated compile errors from ReadAsAsync usage.
+   Impact: 15 build errors were reported from this file during solution build.
+
+Priority 2 - Test Design Errors
+1. Base URL is hardcoded to https://localhost:5001/api/UserService/User.
+   Actual local launch settings are:
+   - UserService: https://localhost:7165
+   - ApiGateway: https://localhost:7095
+   Impact: Tests target the wrong endpoint.
+
+2. Tests expect ListResult<UserListDTO>.Data, but the actual shared DTO uses Items.
+   Impact: Assertions do not match the current API response contract.
+
+3. Tests assume fixed records already exist, such as user ID 1 and role ID 1.
+   Impact: Tests are environment-dependent and fragile.
+
+4. Tests hit a running external service directly with HttpClient instead of using WebApplicationFactory or controlled integration setup.
+   Impact: Tests are not isolated or repeatable.
+
+5. Duplicate-email and update/deactivate tests rely on response fields such as Success and Message that do not exist on OperationResultDTO.
+   Impact: Test expectations do not match the current DTO contract.
+
+Priority 3 - Tasks
+1. Replace ReadAsAsync usage with supported JSON deserialization.
+2. Align assertions with the actual DTO contract from Comman.
+3. Point tests to the correct service or gateway URL.
+4. Replace environment-dependent tests with controlled seeded setup or WebApplicationFactory-based integration tests.
+5. Re-check whether this project should remain an integration test project or be split into unit and integration test layers.

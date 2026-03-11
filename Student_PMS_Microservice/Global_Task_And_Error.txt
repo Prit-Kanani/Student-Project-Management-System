@@ -6,49 +6,32 @@ Purpose
 - This file tracks cross-project and service-to-service issues across the full microservice solution.
 - Project-specific details are stored in each project's Task_And_Error.txt file.
 
-Priority 1 - Critical Build And Runtime Blockers
-1. Solution build is failing because Demo_TestProject uses HttpContent.ReadAsAsync(...), but the current test project setup does not provide that API.
-   Affected project: Demo_TestProject
-   Impact: Full solution does not build.
-
-2. ProjectService has controller dependencies that are not registered in DI.
-   Missing registrations include:
-   - IProjectServices
-   - IProjectRepository
-   - InsertValidation
-   - UpdateValidation
-   Impact: ProjectService controller activation will fail at runtime.
-
-3. Multiple repositories have incorrect async usage in "View" methods.
-   Affected services:
-   - ProjectService
-   - ProjectGroupService
-   Impact: The code maps Task objects instead of database entities and breaks not-found handling.
-
-4. Fixed on 2026-03-11:
-   UserService auth flow now awaits login correctly and validates JWT configuration.
-   ApiGateway JWT bearer authentication has also been added.
-   Status: Resolved for UserService and ApiGateway.
+Priority 1 - Current Global Status
+1. Fixed on 2026-03-11:
+   The full solution now builds successfully.
+   Resolved items included:
+   - Demo_TestProject compile blockers
+   - ProjectService DI registration issues
+   - Broken async repository reads in ProjectService and ProjectGroupService
+   - UserService auth flow and JWT configuration checks
+   - ApiGateway JWT bearer authentication
+   Status: Resolved in code and verified by full solution build.
 
 Priority 2 - Cross-Service Contract And Integration Gaps
-1. Demo_TestProject targets https://localhost:5001/api/UserService/User, but the active launch settings use:
-   - UserService: https://localhost:7165
-   - ApiGateway: https://localhost:7095
-   Impact: Integration tests point to the wrong host and port.
+1. Fixed on 2026-03-11:
+   Demo_TestProject now targets the ApiGateway URL instead of the old localhost:5001 address.
+   Status: Resolved in code.
 
-2. Demo_TestProject expects ListResult<T>.Data, but the shared DTO exposes ListResult<T>.Items.
-   Affected projects:
-   - Demo_TestProject
-   - Comman
-   Impact: Even after compile fixes, test assertions do not match the actual API contract.
+2. Fixed on 2026-03-11:
+   Demo_TestProject now uses ListResult<T>.Items instead of Data.
+   Status: Resolved in code.
 
-3. GroupWiseStudentController route pattern does not align with the API Gateway route prefix.
-   Current controller route: api/[controller]
-   Gateway route prefix: /api/ProjectGroupService/{everything}
-   Impact: GroupWiseStudent endpoints are inconsistent with the rest of ProjectGroupService and are not aligned with gateway expectations.
+3. Fixed on 2026-03-11:
+   GroupWiseStudentController route now aligns with the API Gateway route prefix.
+   Status: Resolved in code.
 
 4. ProjectGroupByProject deactivation still uses a hardcoded ModifiedByID = 1 instead of user identity from JWT.
-   Impact: Cross-service audit/user identity propagation is not implemented.
+   Status: Resolved on 2026-03-11.
 
 Priority 3 - Unfinished Service-To-Service Features
 1. Cross-service HTTP client placeholders exist but contain no actual integration logic.
@@ -64,23 +47,22 @@ Priority 3 - Unfinished Service-To-Service Features
    - UserService/RabbitMQ/MessageBusClient.cs
    Impact: Messaging/event-driven integration is unfinished.
 
-3. UserProfile feature is scaffolded but not implemented.
-   Impact: UserService contains an incomplete domain area that is not production-ready.
+3. UserProfile feature was scaffolded but is now implemented as a basic CRUD path in UserService.
+   Status: Resolved on 2026-03-11.
 
 Priority 4 - Quality And Consistency Issues
-1. Several repositories throw plain Exception instead of service-specific API exceptions.
-   Impact: Error handling is inconsistent across services.
+1. Several repositories originally threw plain Exception instead of service-specific API exceptions.
+   Status: Improved in the fixed services; continue reviewing any future additions for consistency.
 
-2. There are many nullable reference warnings across Comman, UserService, ProjectService, and ProjectGroupService.
-   Impact: Increased risk of null-reference failures and weak model validation.
+2. Fixed on 2026-03-11:
+   Nullable reference warnings across Comman, UserService, ProjectService, and ProjectGroupService were cleaned up.
+   Status: Full solution build now passes with 0 warnings and 0 errors.
 
-3. Some controllers inject validators but do not use them consistently.
-   Impact: Validation behavior is inconsistent across endpoints.
+3. Some controllers and endpoints still have inconsistent validation coverage.
+   Impact: Validation behavior is not yet fully standardized across all services.
 
 Suggested Fix Order
-1. Fix Demo_TestProject compile errors so the solution builds again.
-2. Fix ProjectService DI registration so its endpoints can start.
-3. Fix incorrect async repository code in ProjectService and ProjectGroupService.
-4. Fix UserService auth controller login flow.
-5. Repair gateway/controller route mismatches and test host assumptions.
-6. Implement unfinished UserProfile, service-to-service HTTP clients, and RabbitMQ only after blockers are removed.
+1. Replace remaining placeholder cross-service HTTP client classes with real integrations or remove them.
+2. Decide whether RabbitMQ is required; if yes, implement it fully, otherwise remove dead code.
+3. Replace environment-dependent skipped integration tests with controlled integration infrastructure.
+4. Standardize validation coverage across the remaining endpoints where validators are still absent.

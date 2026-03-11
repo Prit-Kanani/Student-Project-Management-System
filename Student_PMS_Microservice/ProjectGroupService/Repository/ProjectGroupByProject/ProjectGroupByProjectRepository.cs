@@ -29,7 +29,7 @@ public class ProjectGroupByProjectRepository(
 
     public async Task<ListResult<ProjectGroupByProjectListDTO>> GetProjectGroupByProjectsPage()
     {
-        if (_cache.TryGetValue(ProjectGroupByProjectCacheKeys.Page, out ListResult<ProjectGroupByProjectListDTO> cached))
+        if (_cache.TryGetValue(ProjectGroupByProjectCacheKeys.Page, out ListResult<ProjectGroupByProjectListDTO>? cached) && cached is not null)
         {
             return cached;
         }
@@ -51,7 +51,7 @@ public class ProjectGroupByProjectRepository(
     {
         var key = ProjectGroupByProjectCacheKeys.View(projectGroupByProjectID);
 
-        if (_cache.TryGetValue(key, out ProjectGroupByProjectViewDTO cached))
+        if (_cache.TryGetValue(key, out ProjectGroupByProjectViewDTO? cached) && cached is not null)
         {
             return cached;
         }
@@ -73,7 +73,7 @@ public class ProjectGroupByProjectRepository(
     {
         var key = ProjectGroupByProjectCacheKeys.PK(projectGroupByProjectID);
 
-        if (_cache.TryGetValue(key, out ProjectGroupByProjectUpdateDTO cached))
+        if (_cache.TryGetValue(key, out ProjectGroupByProjectUpdateDTO? cached) && cached is not null)
         {
             return cached;
         }

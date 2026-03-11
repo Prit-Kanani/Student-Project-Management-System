@@ -1,4 +1,4 @@
-﻿using Comman.Functions;
+using Comman.Functions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Moq;
@@ -10,10 +10,8 @@ using UserService.Services.Auth;
 
 namespace Demo_TestProject.Controllers;
 
-public class TestingController(
-)
+public class TestingController
 {
-
     [Theory]
     [ClassData(typeof(SampleData))]
     public void Addmethod(int a, int b, object expected)
@@ -21,56 +19,61 @@ public class TestingController(
         var controller = new HomeController();
         var result = controller.Add(a, b);
         Assert.NotNull(result);
-        // If the controller returns an ObjectResult (OkObjectResult/BadRequestObjectResult), compare the Value
+
         if (result is ObjectResult objectResult)
         {
             Assert.Equal(expected, objectResult.Value);
         }
         else
         {
-            // Fallback: compare the IActionResult directly (for non-ObjectResult implementations)
             Assert.Equal(expected, result);
         }
     }
 
     [Theory]
     [ClassData(typeof(LoginData))]
-    public async Task AuthCheck(string Email, string Password)
+    public async Task AuthCheck(string email, string password)
     {
-        //Arrange
         var inMemorySettings = new Dictionary<string, string?>
         {
-            { "SectionName:KeyName", "Value" },
-            { "OtherKey", "OtherValue" }
+            { "Jwt:SecretKey", "SPMS_UserService_SecretKey!" },
+            { "Jwt:Issuer", "SPMS_UserService" },
+            { "Jwt:Audience", "SPMS_UserService" },
+            { "Jwt:ExpiryMinutes", "60" }
         };
 
-        IConfiguration _configuration = new ConfigurationBuilder()
+        IConfiguration configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(inMemorySettings)
             .Build();
 
-        Mock<IAuthRepository> authRepo = new();
+        var authRepo = new Mock<IAuthRepository>();
 
         authRepo.Setup(x => x.Login(It.IsAny<string>()))
-                   .ReturnsAsync((string email) => new LoginDTO { Email = email, Password = HashPass.HashPassword(Password) });
+            .ReturnsAsync((string requestedEmail) => new LoginDTO
+            {
+                Email = requestedEmail,
+                Password = HashPass.HashPassword(password)
+            });
 
         authRepo.Setup(x => x.UserInfo(It.IsAny<string>()))
-                   .ReturnsAsync(new UserInfoDTO { UserID = 1, Email = Email, UserName = "Prit kanani" ,RoleName = "Admmin"  });
+            .ReturnsAsync(new UserInfoDTO
+            {
+                UserID = 1,
+                Email = email,
+                UserName = "Prit kanani",
+                RoleName = "Admin"
+            });
 
-        var authService= new AuthService(_configuration, authRepo.Object);
+        var authService = new AuthService(configuration, authRepo.Object);
 
+        var loginResult = await authService.Login(new LoginDTO { Email = email, Password = password });
 
-        //Act
-        var loginResult = await authService.Login(new LoginDTO { Email= Email, Password=Password});
-
-        // Assert
-            
         Assert.NotNull(loginResult);
         Assert.NotNull(loginResult.Message);
-        Assert.NotNull(loginResult.Token);        
+        Assert.NotNull(loginResult.Token);
     }
 }
 
-#region FackDatas
 public class SampleData : IEnumerable<object[]>
 {
     public IEnumerator<object[]> GetEnumerator()
@@ -89,11 +92,11 @@ public class LoginData : IEnumerable<object[]>
 {
     public IEnumerator<object[]> GetEnumerator()
     {
-        yield return new object[] { "Kananiprit@gmail.com", "prit kanani 9@"};
+        yield return new object[] { "Kananiprit@gmail.com", "prit kanani 9@" };
     }
+
     IEnumerator IEnumerable.GetEnumerator()
     {
         return GetEnumerator();
     }
 }
-#endregion

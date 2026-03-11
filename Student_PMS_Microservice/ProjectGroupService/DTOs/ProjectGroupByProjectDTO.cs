@@ -3,13 +3,13 @@
 public class ProjectGroupByProjectListDTO
 {
     public int ProjectGroupByProjectID { get; set; }
-    public string ProjectGroupName { get; set; }
+    public string ProjectGroupName { get; set; } = string.Empty;
     public int ProjectID { get; set; }
     public bool IsActive { get; set; }
 }
 public class ProjectGroupByProjectViewDTO 
 {
-    public string ProjectGroupName { get; set; }
+    public string ProjectGroupName { get; set; } = string.Empty;
     public int ProjectID { get; set; }
     public bool IsActive { get; set; }
     public DateTime Created { get; set; } = DateTime.Now;

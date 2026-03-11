@@ -11,7 +11,7 @@ public class Role
     public int RoleID { get; set; }
 
     [OptionName]
-    public string RoleName { get; set; }
+    public string RoleName { get; set; } = string.Empty;
     public string? Description { get; set; }
     public bool IsActive { get; set; } = true;
     public DateTime Created { get; set; } = DateTime.UtcNow;
@@ -20,7 +20,7 @@ public class Role
     public int? ModifiedByID { get; set; }
 
     [ForeignKey(nameof(CreatedByID))]
-    public User CreatedBy { get; set; }
+    public User? CreatedBy { get; set; }
 
     [ForeignKey(nameof(ModifiedByID))]
     public User? ModifiedBy { get; set; }

@@ -49,8 +49,8 @@ public class RoleRepository(
             {
                 r.RoleName,
                 r.Description,
-                CreatedBy = r.CreatedBy.Name,
-                ModifiedBy = r.ModifiedBy.Name ?? "—",
+                CreatedBy = r.CreatedBy != null ? r.CreatedBy.Name : "—",
+                ModifiedBy = r.ModifiedBy != null ? r.ModifiedBy.Name : "—",
                 r.IsActive,
                 r.Created,
                 r.Modified

@@ -10,7 +10,7 @@ public class ProjectGroup
     public int ProjectGroupID { get; set; }
 
     [OptionName]
-    public string ProjectGroupName { get; set; }
+    public string ProjectGroupName { get; set; } = string.Empty;
     public bool? IsApproved { get; set; } 
     public bool IsActive { get; set; } = true;
     public int? ApprovedByID { get; set; }

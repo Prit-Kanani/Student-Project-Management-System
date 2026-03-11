@@ -1,65 +1,59 @@
-﻿using Comman.DTOs.CommanDTOs;
+using Comman.DTOs.CommanDTOs;
 using ProjectGroupService.DTOs;
 using ProjectGroupService.Repository.ProjectGroupByProject;
+using ProjectGroupService.Services.External;
 
 namespace ProjectGroupService.Services.ProjectGroupByProject;
 
 public class ProjectGroupByProjectService(
-        IProjectGroupByProjectRepository repository
-)   : IProjectGroupByProjectService
+    IProjectGroupByProjectRepository repository,
+    UserServiceClient userServiceClient,
+    ProjectServiceClient projectServiceClient
+) : IProjectGroupByProjectService
 {
-    #region GET PROJECT GROUP BY PROJECT PAGE
     public async Task<ListResult<ProjectGroupByProjectListDTO>> GetProjectGroupByProjectsPage()
     {
-        var response = await repository.GetProjectGroupByProjectsPage();
-        return response;
+        return await repository.GetProjectGroupByProjectsPage();
     }
-    #endregion
 
-    #region GET PROJECT GROUP BY PROJECT VIEW
     public async Task<ProjectGroupByProjectViewDTO> GetProjectGroupByProjectView(int projectGroupByProjectID)
     {
         var response = await repository.GetProjectGroupByProjectView(projectGroupByProjectID);
+        var auditUsers = await userServiceClient.ResolveAuditUsers(response.CreatedByID, response.ModifiedByID, null);
+        response.CreatedBy = auditUsers.CreatedBy;
+        response.ModifiedBy = auditUsers.ModifiedBy;
         return response;
     }
-    #endregion
 
-    #region GET PROJECT GROUP BY PROJECT PK
     public async Task<ProjectGroupByProjectUpdateDTO> GetProjectGroupByProjectPK(int projectGroupByProjectID)
     {
-        var response = await repository.GetProjectGroupByProjectPK(projectGroupByProjectID);
-        return response;
+        return await repository.GetProjectGroupByProjectPK(projectGroupByProjectID);
     }
-    #endregion
 
-    #region CREATE PROJECT GROUP BY PROJECT
     public async Task<OperationResultDTO> CreateProjectGroupByProject(ProjectGroupByProjectCreateDTO dto)
     {
-        var response = await repository.CreateProjectGroupByProject(dto);
-        return response;
+        await projectServiceClient.EnsureProjectExists(dto.ProjectID);
+        return await repository.CreateProjectGroupByProject(dto);
     }
-    #endregion
 
-    #region UPDATE PROJECT GROUP BY PROJECT
     public async Task<OperationResultDTO> UpdateProjectGroupByProject(ProjectGroupByProjectUpdateDTO dto)
     {
-        var response = await repository.UpdateProjectGroupByProject(dto);
-        return response;
+        await projectServiceClient.EnsureProjectExists(dto.ProjectID);
+        return await repository.UpdateProjectGroupByProject(dto);
     }
-    #endregion
 
-    #region DEACTIVATE PROJECT GROUP BY PROJECT
     public async Task<OperationResultDTO> DeactivateProjectGroupByProject(int projectGroupByProjectID)
     {
-        var response = await repository.DeactivateProjectGroupByProject(projectGroupByProjectID);
-        return response;
+        return await repository.DeactivateProjectGroupByProject(projectGroupByProjectID);
     }
-    #endregion
 
-    #region BULK CREATE PROJECT GROUP BY PROJECT
     public async Task BulkInsertAsync(List<BulkProjectGroupByProjectCreateDTO> projectGroupByProjects)
     {
+        foreach (var item in projectGroupByProjects)
+        {
+            await projectServiceClient.EnsureProjectExists(item.ProjectID);
+        }
+
         await repository.BulkInsertAsync(projectGroupByProjects);
     }
-    #endregion
 }

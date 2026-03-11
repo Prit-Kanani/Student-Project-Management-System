@@ -1,4 +1,4 @@
-﻿namespace ProjectGroupService.DTOs;
+namespace ProjectGroupService.DTOs;
 
 public class ProjectGroupByProjectListDTO
 {
@@ -7,7 +7,8 @@ public class ProjectGroupByProjectListDTO
     public int ProjectID { get; set; }
     public bool IsActive { get; set; }
 }
-public class ProjectGroupByProjectViewDTO 
+
+public class ProjectGroupByProjectViewDTO
 {
     public string ProjectGroupName { get; set; } = string.Empty;
     public int ProjectID { get; set; }
@@ -16,6 +17,8 @@ public class ProjectGroupByProjectViewDTO
     public DateTime? Modified { get; set; }
     public int CreatedByID { get; set; }
     public int? ModifiedByID { get; set; }
+    public string CreatedBy { get; set; } = string.Empty;
+    public string ModifiedBy { get; set; } = string.Empty;
 }
 
 public class ProjectGroupByProjectCreateDTO
@@ -35,6 +38,7 @@ public class BulkProjectGroupByProjectCreateDTO
     public bool IsActive { get; set; } = true;
     public int? CreatedByID { get; set; }
 }
+
 public class ProjectGroupByProjectUpdateDTO
 {
     public int ProjectGroupByProjectID { get; set; }

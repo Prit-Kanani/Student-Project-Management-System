@@ -1,58 +1,46 @@
-﻿using Comman.DTOs.CommanDTOs;
+using Comman.DTOs.CommanDTOs;
 using ProjectGroupService.DTOs;
 using ProjectGroupService.Repository.GroupWiseStudent;
+using ProjectGroupService.Services.External;
 
 namespace ProjectGroupService.Services.GroupWiseStudent;
 
 public class GroupWiseStudentService(
-        IGroupWiseStudentRepository repository
-)   : IGroupWiseStudentService
+    IGroupWiseStudentRepository repository,
+    UserServiceClient userServiceClient
+) : IGroupWiseStudentService
 {
-    #region GET GROUP WISE STUDENT PAGE
-    public async Task<ListResult<GroupWiseStudentListDTO>> GetGroupWiseStudentsPage(int skip,int take)
+    public async Task<ListResult<GroupWiseStudentListDTO>> GetGroupWiseStudentsPage(int skip, int take)
     {
-        var response = await repository.GetGroupWiseStudentsPage(skip, take);
-        return response;
+        return await repository.GetGroupWiseStudentsPage(skip, take);
     }
-    #endregion
 
-    #region GET PROJECT GROUP BY PROJECT VIEW
     public async Task<GroupWiseStudentViewDTO> GetGroupWiseStudentView(int groupWiseStudentID)
     {
         var response = await repository.GetGroupWiseStudentView(groupWiseStudentID);
+        var auditUsers = await userServiceClient.ResolveAuditUsers(response.CreatedByID, response.ModifiedByID, null);
+        response.CreatedBy = auditUsers.CreatedBy;
+        response.ModifiedBy = auditUsers.ModifiedBy;
         return response;
     }
-    #endregion
 
-    #region GET PROJECT GROUP BY PROJECT PK
     public async Task<GroupWiseStudentUpdateDTO> GetGroupWiseStudentPK(int groupWiseStudentID)
     {
-        var response = await repository.GetGroupWiseStudentPK(groupWiseStudentID);
-        return response;
+        return await repository.GetGroupWiseStudentPK(groupWiseStudentID);
     }
-    #endregion
 
-    #region CREATE PROJECT GROUP BY PROJECT
     public async Task<OperationResultDTO> CreateGroupWiseStudent(GroupWiseStudentCreateDTO dto)
     {
-        var response = await repository.CreateGroupWiseStudent(dto);
-        return response;
+        return await repository.CreateGroupWiseStudent(dto);
     }
-    #endregion
 
-    #region UPDATE PROJECT GROUP BY PROJECT
     public async Task<OperationResultDTO> UpdateGroupWiseStudent(GroupWiseStudentUpdateDTO dto)
     {
-        var response = await repository.UpdateGroupWiseStudent(dto);
-        return response;
+        return await repository.UpdateGroupWiseStudent(dto);
     }
-    #endregion
 
-    #region DEACTIVATE PROJECT GROUP BY PROJECT
     public async Task<OperationResultDTO> DeactivateGroupWiseStudent(int groupWiseStudentID)
     {
-        var response = await repository.DeactivateGroupWiseStudent(groupWiseStudentID);
-        return response;
+        return await repository.DeactivateGroupWiseStudent(groupWiseStudentID);
     }
-    #endregion
 }

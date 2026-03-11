@@ -1,12 +1,12 @@
-using Mapster;
-using Comman.Functions;
-using ProjectGroup.Data;
 using Comman.DTOs.CommanDTOs;
+using Comman.Exceptions;
+using Comman.Functions;
 using Comman.MicroserviceDTO;
+using Mapster;
 using Microsoft.EntityFrameworkCore;
-using UserService.Models;
+using ProjectGroup.Data;
 using UserService.DTOs;
-using UserService.Exceptions;
+using UserService.Models;
 
 namespace UserService.Repository.UserRepository;
 
@@ -109,5 +109,28 @@ public class UserRepository(
             .FirstOrDefaultAsync() ?? "—";
 
         return ReflectionMapper.Map<CreatedAndModifiedDTO>(new { CreatedBy = createdBy, ModifiedBy = modifiedBy });
+    }
+
+    public async Task<AuditUsersDTO> ResolveAuditUsers(int createdByID, int? modifiedByID, int? approvedByID)
+    {
+        var createdBy = await context.User
+            .Where(u => u.UserID == createdByID)
+            .Select(u => u.Name)
+            .FirstOrDefaultAsync() ?? throw new NotFoundException("CreatedBy user does not exist!");
+
+        var modifiedBy = modifiedByID.HasValue
+            ? await context.User.Where(u => u.UserID == modifiedByID.Value).Select(u => u.Name).FirstOrDefaultAsync() ?? "—"
+            : "—";
+
+        var approvedBy = approvedByID.HasValue
+            ? await context.User.Where(u => u.UserID == approvedByID.Value).Select(u => u.Name).FirstOrDefaultAsync() ?? "—"
+            : "—";
+
+        return new AuditUsersDTO
+        {
+            CreatedBy = createdBy,
+            ModifiedBy = modifiedBy,
+            ApprovedBy = approvedBy
+        };
     }
 }

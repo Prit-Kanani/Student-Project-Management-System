@@ -40,6 +40,12 @@ Priority 3 - Unfinished Service-To-Service Features
    - ProjectService/Services/ProjectServices/ProjectMicroservices.cs
    - ProjectGroupService/Services/ProjectGroupServices/ProjectMicroservices.cs
    Impact: Intended service-to-service communication is not implemented.
+   Clarification needed before implementation:
+   - Which service should call which downstream service?
+   - Which endpoints should be called?
+   - Which DTOs should be exchanged?
+   - Should calls go direct to services or through ApiGateway?
+   - Should JWT bearer tokens be forwarded on outbound calls?
 
 2. RabbitMQ integration is present only as commented-out code.
    Affected files:
@@ -66,3 +72,4 @@ Suggested Fix Order
 2. Decide whether RabbitMQ is required; if yes, implement it fully, otherwise remove dead code.
 3. Replace environment-dependent skipped integration tests with controlled integration infrastructure.
 4. Standardize validation coverage across the remaining endpoints where validators are still absent.
+5. Before implementing any cross-service HTTP client, define the intended workflow in the relevant project task file to avoid building the wrong integration.

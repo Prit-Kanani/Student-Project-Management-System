@@ -8,6 +8,7 @@ using ProjectGroupService.Exceptions;
 using ProjectGroupService.Repository.GroupWiseStudent;
 using ProjectGroupService.Repository.ProjectGroup;
 using ProjectGroupService.Repository.ProjectGroupByProject;
+using ProjectGroupService.Services.External;
 using ProjectGroupService.Services.GroupWiseStudent;
 using ProjectGroupService.Services.ProjectGroupByProject;
 using ProjectGroupService.Services.ProjectGroupServices;
@@ -64,16 +65,24 @@ builder.Services.AddStackExchangeRedisCache(options =>
 
 builder.Services.AddScoped<IGroupWiseStudentRepository, GroupWiseStudentRepository>();
 builder.Services.AddScoped<IGroupWiseStudentService, GroupWiseStudentService>();
-
 builder.Services.AddScoped<IProjectGroupByProjectService, ProjectGroupByProjectService>();
 builder.Services.AddScoped<IProjectGroupByProjectRepository, ProjectGroupByProjectRepository>();
-
 builder.Services.AddScoped<IProjectGroupServices, ProjectGroupService.Services.ProjectGroupServices.ProjectGroupService>();
 builder.Services.AddScoped<IProjectGroupRepository, ProjectGroupRepository>();
 
 builder.Services.AddMemoryCache();
 builder.Services.AddScoped<InsertValidation>();
 builder.Services.AddScoped<UpdateValidation>();
+builder.Services.AddHttpClient<UserServiceClient>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["MicroserviceUrls:UserServiceBaseUrl"]
+        ?? throw new InvalidOperationException("MicroserviceUrls:UserServiceBaseUrl is missing."));
+});
+builder.Services.AddHttpClient<ProjectServiceClient>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["MicroserviceUrls:ProjectServiceBaseUrl"]
+        ?? throw new InvalidOperationException("MicroserviceUrls:ProjectServiceBaseUrl is missing."));
+});
 
 var app = builder.Build();
 
@@ -108,7 +117,7 @@ app.UseExceptionHandler(errorApp =>
             return;
         }
 
-        if (exception is ApiException apiEx)
+        if (exception is Comman.Exceptions.ApiException apiEx)
         {
             context.Response.StatusCode = apiEx.StatusCode;
             await context.Response.WriteAsJsonAsync(new
@@ -133,10 +142,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();

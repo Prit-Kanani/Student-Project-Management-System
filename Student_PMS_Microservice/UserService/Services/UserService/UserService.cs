@@ -1,75 +1,56 @@
-﻿using Comman.DTOs.CommanDTOs;
+using Comman.DTOs.CommanDTOs;
+using Comman.Exceptions;
 using Comman.MicroserviceDTO;
 using ProjectGroup.Services.UserService;
 using UserService.DTOs;
-using UserService.Exceptions;
 using UserService.Repository.UserRepository;
 
 namespace UserService.Services.UserService;
 
-public class UsersService : IUserService
+public class UsersService(
+    IUserRepository repository
+) : IUserService
 {
-    #region CONFIGURATION
-    private readonly IUserRepository _repository;
-    //private readonly MicroserviceGateway _gateway;
+    private readonly IUserRepository _repository = repository;
 
-    public UsersService(IUserRepository repository /*, MicroserviceGateway gateway*/) 
-        => _repository = repository;//_gatway = gatway;
-    #endregion
-
-    #region GET USERS PAGE
     public async Task<ListResult<UserListDTO>> GetUsersPage()
     {
-        var result = await _repository.GetUsersPage();
-        return result;
+        return await _repository.GetUsersPage();
     }
-    #endregion
 
-    #region GET USER VIEW
     public async Task<UserViewDTO> GetUserView(int userID)
     {
-        var result = await _repository.GetUserView(userID);
-        return result;
+        return await _repository.GetUserView(userID);
     }
-    #endregion
 
-    #region GET USER PK
     public async Task<UserUpdateDTO> GetUserPK(int userID)
     {
-        var result = await _repository.GetUserPK(userID);
-        return result;
+        return await _repository.GetUserPK(userID);
     }
-    #endregion
 
-    #region CREATE USER
     public async Task<OperationResultDTO> CreateUser(UserCreateDTO dto)
     {
-        var result = await _repository.CreateUser(dto);
-        return result;
+        return await _repository.CreateUser(dto);
     }
-    #endregion
 
-    #region UPDATE USER
     public async Task<OperationResultDTO> UpdateUser(UserUpdateDTO dto)
     {
-        var result = await _repository.UpdateUser(dto);
-        return result;
+        return await _repository.UpdateUser(dto);
     }
-    #endregion
 
-    #region DEACTIVATE USER
     public async Task<OperationResultDTO> DeactivateUser(int userID)
     {
         var result = await _repository.DeactivateUser(userID);
         return result == null ? throw new NotFoundException("User not found") : result;
     }
-    #endregion
 
-    #region CREATE AND MODIFIED USER
-    public async Task<CreatedAndModifiedDTO> CreatedAndModifiedBy(int CreatedByID, int ModifiedByID)
+    public async Task<CreatedAndModifiedDTO> CreatedAndModifiedBy(int createdByID, int modifiedByID)
     {
-        var result = await _repository.CreatedAndModifiedBy(CreatedByID, ModifiedByID);
-        return result;
+        return await _repository.CreatedAndModifiedBy(createdByID, modifiedByID);
     }
-    #endregion
+
+    public async Task<AuditUsersDTO> ResolveAuditUsers(int createdByID, int? modifiedByID, int? approvedByID)
+    {
+        return await _repository.ResolveAuditUsers(createdByID, modifiedByID, approvedByID);
+    }
 }

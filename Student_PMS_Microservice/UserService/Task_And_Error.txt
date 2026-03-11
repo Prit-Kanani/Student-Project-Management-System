@@ -21,6 +21,11 @@ Priority 2 - Unfinished Features
 
 3. UserMicroservice is only a placeholder with no outbound integration logic.
    Impact: Intended service-to-service communication is not implemented.
+   Clarification needed before implementation:
+   - Should UserService call ProjectGroupService, ProjectService, or both?
+   - Is the existing CreatedAndModifiedBy endpoint meant for cross-service use?
+   - Should UserService expose only identity/user lookup data, or also role/profile-related composite data?
+   - Should outbound calls go through ApiGateway or direct service URLs from MicroserviceUrls?
 
 Priority 3 - Logic And Consistency Issues
 1. Fixed on 2026-03-11:
@@ -50,3 +55,5 @@ Priority 5 - Tasks
    Reduce nullable warnings and review leftover/demo controllers such as HomeController.
 4. Remaining:
    Review UserRepository.GetUserView and RoleRepository null-safety warnings for stricter handling.
+5. Remaining:
+   Define the intended UserService outbound integration contract before implementing UserMicroservice.

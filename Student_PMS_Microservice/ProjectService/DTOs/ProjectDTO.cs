@@ -1,4 +1,4 @@
-﻿namespace ProjectService.DTOs;
+namespace ProjectService.DTOs;
 
 public class ProjectListDTO
 {
@@ -16,6 +16,8 @@ public class ProjectViewDTO
     public string? Description { get; set; }
     public int CreatedByID { get; set; }
     public int? ModifiedByID { get; set; }
+    public string CreatedBy { get; set; } = string.Empty;
+    public string ModifiedBy { get; set; } = string.Empty;
     public bool IsActive { get; set; }
     public bool IsCompleted { get; set; }
     public DateTime Created { get; set; }

@@ -1,4 +1,4 @@
-﻿using Comman.DTOs.CommanDTOs;
+using Comman.DTOs.CommanDTOs;
 using Comman.MicroserviceDTO;
 using UserService.DTOs;
 
@@ -6,11 +6,12 @@ namespace ProjectGroup.Services.UserService;
 
 public interface IUserService
 {
-    Task<ListResult<UserListDTO>>   GetUsersPage();
-    Task<UserViewDTO>               GetUserView(int userID);
-    Task<UserUpdateDTO>             GetUserPK(int userID);
-    Task<OperationResultDTO>        CreateUser(UserCreateDTO dto);
-    Task<OperationResultDTO>        UpdateUser(UserUpdateDTO dto);
-    Task<OperationResultDTO>        DeactivateUser(int userID);
-    Task<CreatedAndModifiedDTO>     CreatedAndModifiedBy(int CreatedByID, int ModifiedByID);
+    Task<ListResult<UserListDTO>> GetUsersPage();
+    Task<UserViewDTO> GetUserView(int userID);
+    Task<UserUpdateDTO> GetUserPK(int userID);
+    Task<OperationResultDTO> CreateUser(UserCreateDTO dto);
+    Task<OperationResultDTO> UpdateUser(UserUpdateDTO dto);
+    Task<OperationResultDTO> DeactivateUser(int userID);
+    Task<CreatedAndModifiedDTO> CreatedAndModifiedBy(int createdByID, int modifiedByID);
+    Task<AuditUsersDTO> ResolveAuditUsers(int createdByID, int? modifiedByID, int? approvedByID);
 }

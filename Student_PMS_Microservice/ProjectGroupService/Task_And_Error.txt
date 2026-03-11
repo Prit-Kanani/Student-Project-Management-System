@@ -30,6 +30,10 @@ Priority 2 - Routing And API Contract Issues
 
 Priority 3 - Unfinished Work
 1. ProjectMicroservices.cs is only a placeholder with no integration logic.
+   Clarification needed before implementation:
+   - Should ProjectGroupService call ProjectService to validate ProjectID or fetch project metadata?
+   - Should it call UserService to resolve CreatedBy/ModifiedBy/ApprovedBy names?
+   - Which responses should include enriched downstream data versus local IDs only?
 
 2. Fixed on 2026-03-11:
    ProjectGroupService now has JWT authentication configured and ProjectGroupByProject deactivation reads ModifiedByID from authenticated user claims.
@@ -51,3 +55,5 @@ Priority 5 - Tasks
    Reduce nullable warnings in DTOs and models.
 3. Remaining:
    Review whether create/update GroupWiseStudent endpoints also need explicit validation classes for parity with ProjectGroup endpoints.
+4. Remaining:
+   Define the intended ProjectGroupService downstream contract before implementing ProjectMicroservices.

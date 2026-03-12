@@ -1,0 +1,47 @@
+UserService
+Task And Error Notes
+Updated on 2026-03-11
+
+Priority 1 - Completed High-Risk Fixes
+1. Fixed on 2026-03-11:
+   - AuthController.Login now awaits AuthService.Login.
+   - JWT settings are validated during startup and auth service construction.
+   Status: Resolved in code.
+
+2. Fixed on 2026-03-11:
+   - Shared exception handling now uses Comman exceptions instead of service-local ApiException copies.
+   Status: Resolved in code.
+
+3. Fixed on 2026-03-11:
+   - UserService now exposes audit-name resolution for CreatedByID, ModifiedByID, and ApprovedByID through UserController.
+   Status: Implemented for downstream service use.
+
+Priority 2 - Completed Feature Work
+1. Fixed on 2026-03-11:
+   - UserProfileController now exposes endpoints.
+   - UserProfileService now delegates to repository logic.
+   - UserProfileRepository now performs database reads and writes.
+   - UserProfile DTO classes now contain fields.
+   Status: Basic UserProfile CRUD path is implemented.
+
+2. Fixed on 2026-03-11:
+   - The unused UserMicroservice placeholder file was removed.
+   Status: Resolved in code.
+
+Priority 3 - Remaining Work
+1. RabbitMQ integration files are fully commented out.
+   Impact: Event-driven integration is unfinished.
+
+2. UserRepository.GetUserView may still depend on mapper behavior after read-time null handling.
+   Impact: This path should be reviewed again when builds can be re-verified.
+
+3. UserService still contains leftover/demo-style code such as HomeController.
+   Impact: This may not belong in the final service surface.
+
+Priority 4 - Environment Note
+1. Fresh build verification after the latest changes is blocked in this environment because NuGet restore cannot reach api.nuget.org.
+
+Suggested Next Steps
+1. Re-run `dotnet build UserService/UserService.csproj` in a network-enabled environment.
+2. Decide whether RabbitMQ is required; if not, remove the commented integration files.
+3. Review HomeController and any other leftover demo-only endpoints for removal.

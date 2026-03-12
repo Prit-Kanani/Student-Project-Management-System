@@ -1,11 +1,12 @@
-﻿using Mapster;
-using Comman.Functions;
-using ProjectGroup.Data;
 using Comman.DTOs.CommanDTOs;
+using Comman.Exceptions;
+using Comman.Functions;
 using Comman.MicroserviceDTO;
+using Mapster;
 using Microsoft.EntityFrameworkCore;
-using UserService.Models;
+using ProjectGroup.Data;
 using UserService.DTOs;
+using UserService.Models;
 
 namespace UserService.Repository.UserRepository;
 
@@ -13,21 +14,12 @@ public class UserRepository(
     AppDbContext context
 ) : IUserRepository
 {
-
-    #region CONFIGURATION
-    private readonly HashPass hashPass = new();
-    #endregion
-
-    #region GET USERS PAGE
     public async Task<ListResult<UserListDTO>> GetUsersPage()
     {
         var users = await context.User.AsNoTracking().ToListAsync();
-        var result = ReflectionMapper.Map<ListResult<UserListDTO>>(users);
-        return result;
+        return ReflectionMapper.Map<ListResult<UserListDTO>>(users);
     }
-    #endregion
 
-    #region GET USERS VIEW
     public async Task<UserViewDTO> GetUserView(int userID)
     {
         var user = await context.User
@@ -39,27 +31,24 @@ public class UserRepository(
                 u.IsActive,
                 u.Created,
                 u.Modified,
-                u.Role.RoleName,
-                CreatedBy = u.CreatedBy.Name,
-                ModifiedBy = u.ModifiedBy.Name,
+                RoleName = u.Role != null ? u.Role.RoleName : null,
+                CreatedBy = u.CreatedBy != null ? u.CreatedBy.Name : null,
+                ModifiedBy = u.ModifiedBy != null ? u.ModifiedBy.Name : null,
             })
-            .FirstOrDefaultAsync();
-        var result = ReflectionMapper.Map<UserViewDTO>(user);
-        return result;
-    }
-    #endregion
+            .FirstOrDefaultAsync()
+            ?? throw new NotFoundException("User does not exist!");
 
-    #region GET USERS PK
-    public async Task<UserUpdateDTO> GetUserPK(int UserID)
+        return ReflectionMapper.Map<UserViewDTO>(user);
+    }
+
+    public async Task<UserUpdateDTO> GetUserPK(int userID)
     {
-        var user = await context.User.FirstOrDefaultAsync(d => d.UserID == UserID)
-                                        ?? throw new Exception("User does not exist!");
-        var result = ReflectionMapper.Map<UserUpdateDTO>(user);
-        return result;
-    }
-    #endregion
+        var user = await context.User.FirstOrDefaultAsync(d => d.UserID == userID)
+            ?? throw new NotFoundException("User does not exist!");
 
-    #region CREATE USER
+        return ReflectionMapper.Map<UserUpdateDTO>(user);
+    }
+
     public async Task<OperationResultDTO> CreateUser(UserCreateDTO dto)
     {
         var user = dto.Adapt<User>();
@@ -67,52 +56,81 @@ public class UserRepository(
         user.Password = HashPass.HashPassword(dto.Password);
         await context.User.AddAsync(user);
         var rows = await context.SaveChangesAsync();
-        var response = new OperationResultDTO{ Id = user.UserID , RowsAffected = rows };
-        return response;
-    }
-    #endregion
 
-    #region UPDATE USER
+        return new OperationResultDTO
+        {
+            Id = user.UserID,
+            RowsAffected = rows
+        };
+    }
+
     public async Task<OperationResultDTO> UpdateUser(UserUpdateDTO dto)
     {
         var user = await context.User.FirstOrDefaultAsync(d => d.UserID == dto.UserID)
-                                        ?? throw new Exception("User does not exist!");
+            ?? throw new NotFoundException("User does not exist!");
+
         dto.Adapt(user);
         user.Modified = DateTime.UtcNow;
         var rows = await context.SaveChangesAsync();
-        var response = new OperationResultDTO{ Id = user.UserID, RowsAffected = rows };
-        return response;
-    }
-    #endregion
 
-    #region DEACTIVATE USER
-    public async Task<OperationResultDTO> DeactivateUser(int UserID)
+        return new OperationResultDTO
+        {
+            Id = user.UserID,
+            RowsAffected = rows
+        };
+    }
+
+    public async Task<OperationResultDTO> DeactivateUser(int userID)
     {
-        var user = await context.User.FirstOrDefaultAsync(u => u.UserID == UserID) ?? throw new Exception("User does not exist!");
+        var user = await context.User.FirstOrDefaultAsync(u => u.UserID == userID)
+            ?? throw new NotFoundException("User does not exist!");
+
         user.IsActive = false;
         user.Modified = DateTime.UtcNow;
         var rows = await context.SaveChangesAsync();
-        var response = new OperationResultDTO { Id = user.UserID, RowsAffected = rows };
-        return response;
+
+        return new OperationResultDTO
+        {
+            Id = user.UserID,
+            RowsAffected = rows
+        };
     }
-    #endregion
 
-    #region CREATED AND MODIFIED BY
-    public async Task<CreatedAndModifiedDTO> CreatedAndModifiedBy(int CreatedByID, int ModifiedByID)
+    public async Task<CreatedAndModifiedDTO> CreatedAndModifiedBy(int createdByID, int modifiedByID)
     {
-        string CreatedBy = await context.User
-            .Where(u => u.UserID == CreatedByID)
-            .Select(u => u.Name )
-            .FirstOrDefaultAsync() ?? throw new Exception("CreatedBy user does not exist!");
+        string createdBy = await context.User
+            .Where(u => u.UserID == createdByID)
+            .Select(u => u.Name)
+            .FirstOrDefaultAsync() ?? throw new NotFoundException("CreatedBy user does not exist!");
 
-        string ModifiedBy = await context.User
-            .Where(u => u.UserID == ModifiedByID)
-            .Select(u =>u.Name )
+        string modifiedBy = await context.User
+            .Where(u => u.UserID == modifiedByID)
+            .Select(u => u.Name)
             .FirstOrDefaultAsync() ?? "—";
 
-        var response = ReflectionMapper.Map<CreatedAndModifiedDTO>(new { CreatedBy, ModifiedBy });
-
-        return response;
+        return ReflectionMapper.Map<CreatedAndModifiedDTO>(new { CreatedBy = createdBy, ModifiedBy = modifiedBy });
     }
-    #endregion
+
+    public async Task<AuditUsersDTO> ResolveAuditUsers(int createdByID, int? modifiedByID, int? approvedByID)
+    {
+        var createdBy = await context.User
+            .Where(u => u.UserID == createdByID)
+            .Select(u => u.Name)
+            .FirstOrDefaultAsync() ?? throw new NotFoundException("CreatedBy user does not exist!");
+
+        var modifiedBy = modifiedByID.HasValue
+            ? await context.User.Where(u => u.UserID == modifiedByID.Value).Select(u => u.Name).FirstOrDefaultAsync() ?? "—"
+            : "—";
+
+        var approvedBy = approvedByID.HasValue
+            ? await context.User.Where(u => u.UserID == approvedByID.Value).Select(u => u.Name).FirstOrDefaultAsync() ?? "—"
+            : "—";
+
+        return new AuditUsersDTO
+        {
+            CreatedBy = createdBy,
+            ModifiedBy = modifiedBy,
+            ApprovedBy = approvedBy
+        };
+    }
 }

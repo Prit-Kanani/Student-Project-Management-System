@@ -1,0 +1,60 @@
+Student PMS Microservice
+Global Tasks And Errors
+Updated on 2026-03-11
+
+Purpose
+- This file tracks cross-project and service-to-service issues across the full microservice solution.
+- Project-specific details are stored in each project's Task_And_Error.txt file.
+
+Priority 1 - Cross-Service Work Completed
+1. Fixed on 2026-03-11:
+   ProjectService now resolves CreatedByID and ModifiedByID display names by calling UserService.
+   Status: Implemented in code through ProjectService/Services/External/UserServiceClient.cs and ProjectService service layer.
+
+2. Fixed on 2026-03-11:
+   ProjectGroupService now resolves CreatedByID, ModifiedByID, and ApprovedByID display names by calling UserService.
+   Status: Implemented in code through ProjectGroupService/Services/External/UserServiceClient.cs and service layer enrichment.
+
+3. Fixed on 2026-03-11:
+   ProjectGroupService now validates ProjectID by calling ProjectService before create and update flows in ProjectGroupByProject.
+   Status: Implemented in code through ProjectGroupService/Services/External/ProjectServiceClient.cs.
+
+4. Fixed on 2026-03-11:
+   Shared API exception types were moved into Comman and reused across services.
+   Status: Implemented in code through Comman/Exceptions/ApiException.cs.
+
+5. Fixed on 2026-03-11:
+   Confirmed-unused placeholder microservice client files and other dead code were removed.
+   Removed items:
+   - UserService/Services/UserService/UserMicroservice.cs
+   - ProjectService/Services/ProjectServices/ProjectMicroservices.cs
+   - ProjectGroupService/Services/ProjectGroupServices/ProjectMicroservices.cs
+   - Comman/Functions/OptionMapper.cs
+   - ProjectGroupService/Services/ProjectGroupByProject/Validation/InsertProjectGroupByProjectValidation.cs
+
+Priority 2 - Current Environment Limitation
+1. Build verification is currently blocked in this execution environment because NuGet restore cannot reach https://api.nuget.org/v3/index.json.
+   Observed on 2026-03-11 while running dotnet build for:
+   - UserService/UserService.csproj
+   - ProjectService/ProjectService.csproj
+   - ProjectGroupService/ProjectGroupService.csproj
+   Impact: Code changes were applied, but a fresh build could not be fully re-verified in this sandbox after the latest edits.
+
+Priority 3 - Remaining Global Work
+1. RabbitMQ integration is still present only as commented-out code.
+   Affected files:
+   - UserService/RabbitMQ/GlobalMessageSubscriber.cs
+   - UserService/RabbitMQ/MessageBusClient.cs
+   Impact: Messaging/event-driven integration is unfinished.
+
+2. Some controllers and endpoints still have inconsistent validation coverage.
+   Impact: Validation behavior is not yet fully standardized across all services.
+
+3. Demo_TestProject integration tests are still environment-dependent and skipped by default.
+   Impact: Cross-service behavior is not yet verified by a controlled automated integration setup.
+
+Suggested Fix Order
+1. Re-run restore/build in an environment with NuGet access and verify the latest cross-service changes.
+2. Decide whether RabbitMQ is required; if yes, implement it fully, otherwise remove dead code.
+3. Standardize validation coverage across remaining endpoints.
+4. Replace skipped environment-dependent integration tests with controlled integration infrastructure.

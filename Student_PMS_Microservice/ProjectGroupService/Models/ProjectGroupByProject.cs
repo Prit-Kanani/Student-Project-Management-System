@@ -15,6 +15,6 @@ public class ProjectGroupByProject
     public int? ModifiedByID { get; set; } 
 
     [ForeignKey(nameof(ProjectGroupID))]
-    public ProjectGroup projectGroup { get; set; }
+    public ProjectGroup? projectGroup { get; set; }
 
 }

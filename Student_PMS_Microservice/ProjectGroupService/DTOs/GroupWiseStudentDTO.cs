@@ -1,10 +1,10 @@
-﻿namespace ProjectGroupService.DTOs;
+namespace ProjectGroupService.DTOs;
 
 public class GroupWiseStudentListDTO
 {
     public int StudentWiseGroupID { get; set; }
     public int ProjectGroupID { get; set; }
-    public bool IsActive { get; set; } 
+    public bool IsActive { get; set; }
 }
 
 public class GroupWiseStudentViewDTO
@@ -16,6 +16,8 @@ public class GroupWiseStudentViewDTO
     public DateTime? Modified { get; set; }
     public int CreatedByID { get; set; }
     public int? ModifiedByID { get; set; }
+    public string CreatedBy { get; set; } = string.Empty;
+    public string ModifiedBy { get; set; } = string.Empty;
 }
 
 public class GroupWiseStudentCreateDTO

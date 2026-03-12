@@ -3,15 +3,15 @@
 public class UserListDTO
 {
     public int UserID { get; set; }
-    public string Name { get; set; }
-    public string Email { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
     public bool IsActive { get; set; }
 }
 
 public class UserViewDTO
 {
-    public string Name { get; set; }
-    public string Email { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
     public string? RoleName { get; set; }
     public string? CreatedBy { get; set; }
     public string? ModifiedBy { get; set; }
@@ -23,9 +23,9 @@ public class UserViewDTO
 
 public class UserCreateDTO
 {
-    public string Name { get; set; }
-    public string Email { get; set; }
-    public string Password { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
     public int? RoleID { get; set; }
     public bool IsActive { get; set; } = true;
 }
@@ -33,8 +33,8 @@ public class UserCreateDTO
 public class UserUpdateDTO
 {
     public int UserID { get; set; }
-    public string Name { get; set; }
-    public string Email { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
     public int? RoleID { get; set; }
     public bool IsActive { get; set; } = true;
 }

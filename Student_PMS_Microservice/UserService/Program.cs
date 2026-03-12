@@ -1,4 +1,6 @@
-﻿using Comman.DTOs.CommanDTOs;
+﻿#region Using directives
+
+using Comman.DTOs.CommanDTOs;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +12,7 @@ using ProjectGroup.Services.UserService;
 using ProjectGroup.Validations;
 using Serilog;
 using System.Text;
+using System.Threading.RateLimiting; // <-- for rate limiting implementations
 using UserService.Exceptions;
 using UserService.Repository.Auth;
 using UserService.Repository.RoleRepository;
@@ -20,6 +23,9 @@ using UserService.Services.RoleService;
 using UserService.Services.UserProfile;
 using UserService.Services.UserService;
 
+#endregion
+
+#region Try and Catch
 try
 {
     #region Serilog Configuration
@@ -32,6 +38,7 @@ try
     Log.Information("Starting web application");
     #endregion
 
+    #region Builder Configuration
     var builder = WebApplication.CreateBuilder(args);
 
     // Register Serilog as the host logger so required Serilog services (like DiagnosticContext) are available.
@@ -42,6 +49,7 @@ try
 
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
     builder.Services.AddEndpointsApiExplorer();
+    #endregion
 
     #region Swagger with JWT Authentication
     builder.Services.AddSwaggerGen(options =>
@@ -51,6 +59,7 @@ try
             Title = "User Service",
             Version = "v1"
         });
+        options.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
         options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
         {
             Name = "Authorization",
@@ -71,7 +80,7 @@ try
                         Id = "Bearer"
                     }
                 },
-                Array.Empty<string>()
+                new string[] {}
             }
         });
     });
@@ -100,11 +109,101 @@ try
 
     builder.Services.AddScoped<IAuthService, AuthService>();
     builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+
+    #endregion
+
+    #region Rate Limiting Configuration
+    // ----------------------------------------------------------------
+    // Rate limiting options (two implementations provided). Both blocks
+    // are commented out so you can enable one at a time to test.
+    // ----------------------------------------------------------------
+
+    // -----------------------------
+    // Fixed window implementation
+    // -----------------------------
+    // Uncomment the following block to enable a fixed-window rate limiter.
+    // This applies a per-IP fixed window with 10 permits per 60 seconds.
+    /*
+    builder.Services.AddRateLimiter(options =>
+    {
+        options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+        {
+            var ip = httpContext.Connection.RemoteIpAddress?.ToString() ?? "anonymous";
+            return RateLimitPartition.GetFixedWindowLimiter(ip, _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 10,
+                Window = TimeSpan.FromSeconds(60),
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 0
+            });
+        });
+
+        options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+        // Optional: Customize the response body when rejected
+        options.OnRejected = async (context, cancellationToken) =>
+        {
+            context.HttpContext.Response.ContentType = "application/json";
+            context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+            var payload = new { StatusCode = 429, Message = "Too many requests - fixed window" };
+            await context.HttpContext.Response.WriteAsJsonAsync(payload, cancellationToken);
+        };
+    });
+    */
+
+    // -----------------------------
+    // Token-bucket implementation
+    // -----------------------------
+    // Uncomment the following block to enable a token-bucket rate limiter.
+    // This applies a per-IP token bucket with a burst of 20 tokens and
+    // replenishes 1 token per second.
+
+    builder.Services.AddRateLimiter(options =>
+    {
+        options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+        {
+            var ip = httpContext.Connection.RemoteIpAddress?.ToString() ?? "anonymous";
+            return RateLimitPartition.GetTokenBucketLimiter(ip, _ => new TokenBucketRateLimiterOptions
+            {
+                TokenLimit = 5,
+                TokensPerPeriod = 1,
+                ReplenishmentPeriod = TimeSpan.FromSeconds(1),
+                AutoReplenishment = true,
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 0
+            });
+        });
+
+        options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+        // Optional: Customize the response body when rejected
+        options.OnRejected = async (context, cancellationToken) =>
+        {
+            context.HttpContext.Response.ContentType = "application/json";
+            context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+            var payload = new { StatusCode = 429, Message = "Too many requests - token bucket" };
+            await context.HttpContext.Response.WriteAsJsonAsync(payload, cancellationToken);
+        };
+    });
+
+
+    // Note: When you enable one of the above, also uncomment the
+    // corresponding middleware call in the pipeline below: app.UseRateLimiter();
+
     #endregion
 
     #region JWT Authentication
 
-    var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>();
+    var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>()
+        ?? throw new InvalidOperationException("Jwt configuration section is missing.");
+
+    if (string.IsNullOrWhiteSpace(jwtSettings.SecretKey) ||
+        string.IsNullOrWhiteSpace(jwtSettings.Issuer) ||
+        string.IsNullOrWhiteSpace(jwtSettings.Audience))
+    {
+        throw new InvalidOperationException("Jwt configuration is incomplete.");
+    }
+
     var key = Encoding.UTF8.GetBytes(jwtSettings.SecretKey);
 
     builder.Services.AddAuthentication(options =>
@@ -128,37 +227,7 @@ try
     });
     #endregion
 
-    #region Hangfire (SQL storage + Dashboard)
-    //// Read Hangfire configuration if present, otherwise fall back to sensible defaults.
-    //var hangfireSection = builder.Configuration.GetSection("Hangfire");
-    //var hangfireConnName = hangfireSection.GetValue<string>("ConnectionStringName") ?? "myConnectionString";
-    //var hangfireConnectionString = builder.Configuration.GetConnectionString(hangfireConnName)
-    //                              ?? throw new InvalidOperationException($"No connection string found for Hangfire (name: '{hangfireConnName}').");
-
-    //var sqlSection = hangfireSection.GetSection("SqlServer");
-    //var schema = sqlSection.GetValue<string>("SchemaName") ?? "hangfire";
-    //var queuePollInterval = TimeSpan.Parse(sqlSection.GetValue<string>("QueuePollInterval") ?? "00:00:15");
-    //var disableGlobalLocks = sqlSection.GetValue<bool?>("DisableGlobalLocks") ?? false;
-
-    //builder.Services.AddHangfire(cfg =>
-    //{
-    //    cfg.UseSimpleAssemblyNameTypeSerializer()
-    //       .UseRecommendedSerializerSettings()
-    //       .UseSqlServerStorage(hangfireConnectionString, new SqlServerStorageOptions
-    //       {
-    //           CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
-    //           SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
-    //           QueuePollInterval = queuePollInterval,
-    //           CommandTimeout = TimeSpan.FromMinutes(5),
-    //           SchemaName = schema,
-    //           DisableGlobalLocks = disableGlobalLocks
-    //       });
-    //});
-    //Console.WriteLine(hangfireConnName ?? "NULL");
-    //// Adds the background server that will process jobs
-    //builder.Services.AddHangfireServer();
-    #endregion
-
+    #region App configuration and middleware
     var app = builder.Build();
 
     // request logging middleware depends on Serilog services registered above
@@ -175,6 +244,9 @@ try
         });
     }
 
+    // When enabling rate limiting, uncomment the following line to activate the middleware.
+     app.UseRateLimiter();
+
     app.UseMiddleware<ExceptionMiddleware>();
 
     app.UseHttpsRedirection();
@@ -182,41 +254,10 @@ try
     app.UseAuthentication();
     app.UseAuthorization();
 
-    #region Hangfire Dashboard Middleware
-    // Mount the dashboard with options derived from configuration.
-    //var dashboardPath = hangfireSection.GetSection("Dashboard").GetValue<string>("Path") ?? "/hangfire";
-    //var requireAuth = hangfireSection.GetSection("Dashboard").GetValue<bool?>("RequireAuthorization") ?? false;
-    //var allowedRoles = hangfireSection.GetSection("Dashboard:AllowedRoles").Get<string[]>() ?? [];
-
-    //DashboardOptions dashboardOptions;
-    //if (requireAuth)
-    //{
-    //    dashboardOptions = new DashboardOptions
-    //    {
-    //        Authorization =
-    //        [
-    //            new HangfireDashboardAuthorizationFilter(allowedRoles)
-    //        ]
-    //    };
-    //}
-    //else
-    //{
-    //    // Allow anonymous access to dashboard (use only in safe/dev environments)
-    //    dashboardOptions = new DashboardOptions
-    //    {
-    //        Authorization =
-    //        [
-    //            new AllowAllDashboardAuthorizationFilter()
-    //        ]
-    //    };
-    //}
-
-    //app.UseHangfireDashboard(dashboardPath, dashboardOptions);
-    #endregion
-
     app.MapControllers();
 
     app.Run();
+    #endregion
 }
 catch (Exception ex)
 {
@@ -226,28 +267,4 @@ finally
 {
     Log.CloseAndFlush();
 }
-
-// Local authorization filter used by the Hangfire dashboard mounting above.
-// Placed at file bottom to avoid changing other files.
-//internal class HangfireDashboardAuthorizationFilter(
-//    string[] allowedRoles
-//) : IDashboardAuthorizationFilter
-//{
-//    private readonly string[] _allowedRoles = allowedRoles ?? [];
-
-//    public bool Authorize(DashboardContext context)
-//    {
-//        var httpContext = context.GetHttpContext();
-//        var user = httpContext.User;
-//        if (user?.Identity?.IsAuthenticated != true) return false;
-
-//        if (_allowedRoles.Length == 0) return true; // any authenticated user allowed
-
-//        return _allowedRoles.Any(role => user.IsInRole(role));
-//    }
-//}
-
-//internal class AllowAllDashboardAuthorizationFilter : IDashboardAuthorizationFilter
-//{
-//    public bool Authorize(DashboardContext context) => true;
-//}
+#endregion

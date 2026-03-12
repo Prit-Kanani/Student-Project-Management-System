@@ -1,0 +1,41 @@
+Demo_TestProject
+Task And Error Notes
+Generated from repository review on 2026-03-11
+
+Priority 1 - Critical Errors
+1. Fixed on 2026-03-11:
+   IntegrationTesting.cs no longer uses HttpContent.ReadAsAsync(...).
+   Status: Resolved in code.
+
+2. Fixed on 2026-03-11:
+   Compile-time test DTO and deserialization mismatches were corrected.
+   Status: Resolved in code.
+
+Priority 2 - Test Design Errors
+1. Fixed on 2026-03-11:
+   Base URL now targets ApiGateway at https://localhost:7095/api/UserService/User.
+   Status: Resolved in code.
+
+2. Fixed on 2026-03-11:
+   Tests now use ListResult<T>.Items instead of Data.
+   Status: Resolved in code.
+
+3. Tests assume fixed records already exist, such as user ID 1 and role ID 1.
+   Impact: Tests are environment-dependent and fragile.
+
+4. Tests hit a running external service directly with HttpClient instead of using WebApplicationFactory or controlled integration setup.
+   Impact: Tests are not isolated or repeatable.
+
+5. Fixed on 2026-03-11:
+   OperationResultDTO assertions were aligned to Id and RowsAffected.
+   Status: Resolved in code.
+
+Priority 3 - Tasks
+1. Fixed on 2026-03-11:
+   ReadAsAsync was replaced with supported JSON deserialization.
+2. Remaining:
+   Replace environment-dependent tests with controlled seeded setup or WebApplicationFactory-based integration tests.
+3. Remaining:
+   Decide whether this project should remain an integration test project or be split into unit and integration test layers.
+4. Remaining:
+   Integration tests are currently marked skipped by default because they require a live environment.

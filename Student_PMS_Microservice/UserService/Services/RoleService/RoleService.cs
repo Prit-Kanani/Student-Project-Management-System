@@ -1,74 +1,48 @@
-﻿using Comman.DTOs.CommanDTOs;
+using Comman.DTOs.CommanDTOs;
+using Comman.Exceptions;
 using ProjectGroup.Services.RoleService;
 using UserService.DTOs;
-using UserService.Exceptions;
 using UserService.Repository.RoleRepository;
 
 namespace UserService.Services.RoleService;
 
 public class RoleService(
-    IRoleRepository repository 
-    /*, MicroserviceGateway gateway*/
+    IRoleRepository repository
 ) : IRoleService
 {
-    #region CONFIGURATION
-    private readonly IRoleRepository _repository = repository;
-    #endregion
-
-    #region GET ROLES PAGE
     public async Task<ListResult<RoleListDTO>> GetRolesPage()
     {
-        var result = await _repository.GetRolesPage();
-        return result;
+        return await repository.GetRolesPage();
     }
-    #endregion
 
-    #region GET ROLE VIEW
     public async Task<RoleViewDTO> GetRoleView(int userID)
     {
-        var result = await _repository.GetRoleView(userID);
-        return result;
+        return await repository.GetRoleView(userID);
     }
-    #endregion
 
-    #region GET ROLE PK
     public async Task<RoleUpdateDTO> GetRolePK(int roleID)
     {
-        var result = await _repository.GetRolePK(roleID);
-        return result;
+        return await repository.GetRolePK(roleID);
     }
-    #endregion
 
-    #region CREATE ROLE
     public async Task<OperationResultDTO> CreateRole(RoleCreateDTO dto)
     {
-        var result = await _repository.CreateRole(dto);
-        return result;
+        return await repository.CreateRole(dto);
     }
-    #endregion
 
-    #region UPDATE ROLE
     public async Task<OperationResultDTO> UpdateRole(RoleUpdateDTO dto)
     {
-        var response = await _repository.UpdateRole(dto);
-        if(response != null) throw new NotFoundException("Role not found");
-        return response;
+        return await repository.UpdateRole(dto);
     }
-    #endregion
 
-    #region DEACTIVATE ROLE
     public async Task<OperationResultDTO> DeactivateRole(int roleID)
     {
-        var response = await _repository.DeactivateRole(roleID);
-        return response ?? throw new NotFoundException("Role not found");
+        return await repository.DeactivateRole(roleID)
+            ?? throw new NotFoundException("Role not found");
     }
-    #endregion
 
-    #region GET ROLE DROPDOWN
     public async Task<List<OptionDTO>> GetRoleDropdown()
     {
-        var result = await _repository.GetRoleDropdown();
-        return result;
+        return await repository.GetRoleDropdown();
     }
-    #endregion
 }

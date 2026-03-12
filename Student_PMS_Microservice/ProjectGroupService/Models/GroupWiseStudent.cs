@@ -16,5 +16,5 @@ public class GroupWiseStudent
     public int? ModifiedByID { get; set; }
 
     [ForeignKey(nameof(ProjectGroupID))]
-    public ProjectGroup ProjectGroup { get; set; }
+    public ProjectGroup? ProjectGroup { get; set; }
 }

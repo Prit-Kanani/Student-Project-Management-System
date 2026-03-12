@@ -1,76 +1,102 @@
-﻿using Microsoft.AspNetCore.Diagnostics;
+using Comman.DTOs.CommanDTOs;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using ProjectGroupService.Data;
 using ProjectGroupService.Exceptions;
 using ProjectGroupService.Repository.GroupWiseStudent;
 using ProjectGroupService.Repository.ProjectGroup;
 using ProjectGroupService.Repository.ProjectGroupByProject;
+using ProjectGroupService.Services.External;
 using ProjectGroupService.Services.GroupWiseStudent;
 using ProjectGroupService.Services.ProjectGroupByProject;
 using ProjectGroupService.Services.ProjectGroupServices;
 using ProjectGroupService.Validation;
 using ProjectGroupServices.Data;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<DataContext>();
+builder.Services.AddHttpContextAccessor();
 
-// --- Register DbContext ---
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("myConnectionString")));
-#region Reddis Implementation
-// 1. Connection String
-var redisConnection = builder.Configuration.GetConnectionString("RedisURL");
 
-// 2. Register Redis Cache
+var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>()
+    ?? throw new InvalidOperationException("Jwt configuration section is missing.");
+
+if (string.IsNullOrWhiteSpace(jwtSettings.SecretKey) ||
+    string.IsNullOrWhiteSpace(jwtSettings.Issuer) ||
+    string.IsNullOrWhiteSpace(jwtSettings.Audience))
+{
+    throw new InvalidOperationException("Jwt configuration is incomplete.");
+}
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtSettings.Issuer,
+            ValidAudience = jwtSettings.Audience,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey)),
+            ClockSkew = TimeSpan.Zero
+        };
+    });
+
+builder.Services.AddAuthorization();
+
+var redisConnection = builder.Configuration.GetConnectionString("RedisURL");
 builder.Services.AddStackExchangeRedisCache(options =>
 {
     options.Configuration = redisConnection;
-    options.InstanceName = "ProjectGroupSys_"; // All keys will start with this
+    options.InstanceName = "ProjectGroupSys_";
 });
-#endregion
 
-#region Services and Repository
-
-// --- Register Services and Repository ---
 builder.Services.AddScoped<IGroupWiseStudentRepository, GroupWiseStudentRepository>();
 builder.Services.AddScoped<IGroupWiseStudentService, GroupWiseStudentService>();
-
 builder.Services.AddScoped<IProjectGroupByProjectService, ProjectGroupByProjectService>();
 builder.Services.AddScoped<IProjectGroupByProjectRepository, ProjectGroupByProjectRepository>();
-
 builder.Services.AddScoped<IProjectGroupServices, ProjectGroupService.Services.ProjectGroupServices.ProjectGroupService>();
 builder.Services.AddScoped<IProjectGroupRepository, ProjectGroupRepository>();
 
 builder.Services.AddMemoryCache();
 builder.Services.AddScoped<InsertValidation>();
 builder.Services.AddScoped<UpdateValidation>();
-
-#endregion
+builder.Services.AddHttpClient<UserServiceClient>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["MicroserviceUrls:UserServiceBaseUrl"]
+        ?? throw new InvalidOperationException("MicroserviceUrls:UserServiceBaseUrl is missing."));
+});
+builder.Services.AddHttpClient<ProjectServiceClient>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["MicroserviceUrls:ProjectServiceBaseUrl"]
+        ?? throw new InvalidOperationException("MicroserviceUrls:ProjectServiceBaseUrl is missing."));
+});
 
 var app = builder.Build();
 
 app.MapGet("/ping", () => "pong");
 
-
-// --- ExeptionHandaler ---
-app.UseExceptionHandler(builder =>
+app.UseExceptionHandler(errorApp =>
 {
-    builder.Run(async context =>
+    errorApp.Run(async context =>
     {
         var feature = context.Features.Get<IExceptionHandlerFeature>();
         var exception = feature?.Error;
 
         context.Response.ContentType = "application/json";
 
-        // 🔹 FluentValidation
         if (exception is FluentValidation.ValidationException fvEx)
         {
             context.Response.StatusCode = StatusCodes.Status400BadRequest;
@@ -91,22 +117,17 @@ app.UseExceptionHandler(builder =>
             return;
         }
 
-        // 🔹 Your custom API exceptions
-        if (exception is ApiException apiEx)
+        if (exception is Comman.Exceptions.ApiException apiEx)
         {
             context.Response.StatusCode = apiEx.StatusCode;
-
             await context.Response.WriteAsJsonAsync(new
             {
                 message = apiEx.Message
             });
-
             return;
         }
 
-        // 🔹 True unknown errors (actual 500)
         context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-
         await context.Response.WriteAsJsonAsync(new
         {
             message = "Internal Server Error"
@@ -114,11 +135,6 @@ app.UseExceptionHandler(builder =>
     });
 });
 
-
-
-
-
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -126,9 +142,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();

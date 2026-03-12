@@ -1,8 +1,5 @@
 ﻿using Comman.DTOs.CommanDTOs;
 using FluentValidation;
-using Hangfire;
-using Hangfire.Dashboard;
-using Hangfire.SqlServer;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -132,40 +129,40 @@ try
     #endregion
 
     #region Hangfire (SQL storage + Dashboard)
-    // Read Hangfire configuration if present, otherwise fall back to sensible defaults.
-    var hangfireSection = builder.Configuration.GetSection("Hangfire");
-    var hangfireConnName = hangfireSection.GetValue<string>("ConnectionStringName") ?? "myConnectionString";
-    var hangfireConnectionString = builder.Configuration.GetConnectionString(hangfireConnName)
-                                  ?? throw new InvalidOperationException($"No connection string found for Hangfire (name: '{hangfireConnName}').");
+    //// Read Hangfire configuration if present, otherwise fall back to sensible defaults.
+    //var hangfireSection = builder.Configuration.GetSection("Hangfire");
+    //var hangfireConnName = hangfireSection.GetValue<string>("ConnectionStringName") ?? "myConnectionString";
+    //var hangfireConnectionString = builder.Configuration.GetConnectionString(hangfireConnName)
+    //                              ?? throw new InvalidOperationException($"No connection string found for Hangfire (name: '{hangfireConnName}').");
 
-    var sqlSection = hangfireSection.GetSection("SqlServer");
-    var schema = sqlSection.GetValue<string>("SchemaName") ?? "hangfire";
-    var queuePollInterval = TimeSpan.Parse(sqlSection.GetValue<string>("QueuePollInterval") ?? "00:00:15");
-    var disableGlobalLocks = sqlSection.GetValue<bool?>("DisableGlobalLocks") ?? false;
+    //var sqlSection = hangfireSection.GetSection("SqlServer");
+    //var schema = sqlSection.GetValue<string>("SchemaName") ?? "hangfire";
+    //var queuePollInterval = TimeSpan.Parse(sqlSection.GetValue<string>("QueuePollInterval") ?? "00:00:15");
+    //var disableGlobalLocks = sqlSection.GetValue<bool?>("DisableGlobalLocks") ?? false;
 
-    builder.Services.AddHangfire(cfg =>
-    {
-        cfg.UseSimpleAssemblyNameTypeSerializer()
-           .UseRecommendedSerializerSettings()
-           .UseSqlServerStorage(hangfireConnectionString, new SqlServerStorageOptions
-           {
-               CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
-               SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
-               QueuePollInterval = queuePollInterval,
-               CommandTimeout = TimeSpan.FromMinutes(5),
-               SchemaName = schema,
-               DisableGlobalLocks = disableGlobalLocks
-           });
-    });
-
-    // Adds the background server that will process jobs
-    builder.Services.AddHangfireServer();
+    //builder.Services.AddHangfire(cfg =>
+    //{
+    //    cfg.UseSimpleAssemblyNameTypeSerializer()
+    //       .UseRecommendedSerializerSettings()
+    //       .UseSqlServerStorage(hangfireConnectionString, new SqlServerStorageOptions
+    //       {
+    //           CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
+    //           SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
+    //           QueuePollInterval = queuePollInterval,
+    //           CommandTimeout = TimeSpan.FromMinutes(5),
+    //           SchemaName = schema,
+    //           DisableGlobalLocks = disableGlobalLocks
+    //       });
+    //});
+    //Console.WriteLine(hangfireConnName ?? "NULL");
+    //// Adds the background server that will process jobs
+    //builder.Services.AddHangfireServer();
     #endregion
 
     var app = builder.Build();
 
     // request logging middleware depends on Serilog services registered above
-    app.UseDeveloperExceptionPage();
+    //app.UseDeveloperExceptionPage();
     //app.UseSerilogRequestLogging();
 
     // Configure the HTTP request pipeline.
@@ -187,34 +184,34 @@ try
 
     #region Hangfire Dashboard Middleware
     // Mount the dashboard with options derived from configuration.
-    var dashboardPath = hangfireSection.GetSection("Dashboard").GetValue<string>("Path") ?? "/hangfire";
-    var requireAuth = hangfireSection.GetSection("Dashboard").GetValue<bool?>("RequireAuthorization") ?? false;
-    var allowedRoles = hangfireSection.GetSection("Dashboard:AllowedRoles").Get<string[]>() ?? [];
+    //var dashboardPath = hangfireSection.GetSection("Dashboard").GetValue<string>("Path") ?? "/hangfire";
+    //var requireAuth = hangfireSection.GetSection("Dashboard").GetValue<bool?>("RequireAuthorization") ?? false;
+    //var allowedRoles = hangfireSection.GetSection("Dashboard:AllowedRoles").Get<string[]>() ?? [];
 
-    DashboardOptions dashboardOptions;
-    if (requireAuth)
-    {
-        dashboardOptions = new DashboardOptions
-        {
-            Authorization =
-            [
-                new HangfireDashboardAuthorizationFilter(allowedRoles)
-            ]
-        };
-    }
-    else
-    {
-        // Allow anonymous access to dashboard (use only in safe/dev environments)
-        dashboardOptions = new DashboardOptions
-        {
-            Authorization =
-            [
-                new AllowAllDashboardAuthorizationFilter()
-            ]
-        };
-    }
+    //DashboardOptions dashboardOptions;
+    //if (requireAuth)
+    //{
+    //    dashboardOptions = new DashboardOptions
+    //    {
+    //        Authorization =
+    //        [
+    //            new HangfireDashboardAuthorizationFilter(allowedRoles)
+    //        ]
+    //    };
+    //}
+    //else
+    //{
+    //    // Allow anonymous access to dashboard (use only in safe/dev environments)
+    //    dashboardOptions = new DashboardOptions
+    //    {
+    //        Authorization =
+    //        [
+    //            new AllowAllDashboardAuthorizationFilter()
+    //        ]
+    //    };
+    //}
 
-    app.UseHangfireDashboard(dashboardPath, dashboardOptions);
+    //app.UseHangfireDashboard(dashboardPath, dashboardOptions);
     #endregion
 
     app.MapControllers();
@@ -232,25 +229,25 @@ finally
 
 // Local authorization filter used by the Hangfire dashboard mounting above.
 // Placed at file bottom to avoid changing other files.
-internal class HangfireDashboardAuthorizationFilter(
-    string[] allowedRoles
-) : IDashboardAuthorizationFilter
-{
-    private readonly string[] _allowedRoles = allowedRoles ?? [];
+//internal class HangfireDashboardAuthorizationFilter(
+//    string[] allowedRoles
+//) : IDashboardAuthorizationFilter
+//{
+//    private readonly string[] _allowedRoles = allowedRoles ?? [];
 
-    public bool Authorize(DashboardContext context)
-    {
-        var httpContext = context.GetHttpContext();
-        var user = httpContext.User;
-        if (user?.Identity?.IsAuthenticated != true) return false;
+//    public bool Authorize(DashboardContext context)
+//    {
+//        var httpContext = context.GetHttpContext();
+//        var user = httpContext.User;
+//        if (user?.Identity?.IsAuthenticated != true) return false;
 
-        if (_allowedRoles.Length == 0) return true; // any authenticated user allowed
+//        if (_allowedRoles.Length == 0) return true; // any authenticated user allowed
 
-        return _allowedRoles.Any(role => user.IsInRole(role));
-    }
-}
+//        return _allowedRoles.Any(role => user.IsInRole(role));
+//    }
+//}
 
-internal class AllowAllDashboardAuthorizationFilter : IDashboardAuthorizationFilter
-{
-    public bool Authorize(DashboardContext context) => true;
-}
+//internal class AllowAllDashboardAuthorizationFilter : IDashboardAuthorizationFilter
+//{
+//    public bool Authorize(DashboardContext context) => true;
+//}

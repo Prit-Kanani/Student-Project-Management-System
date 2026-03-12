@@ -44,11 +44,11 @@ public class AuthService(
     {
         var claims = new List<Claim>
         {
-            new Claim(JwtRegisteredClaimNames.Sub, userInfo.UserID.ToString()),
-            new Claim(JwtRegisteredClaimNames.UniqueName, userInfo.UserName),
-            new Claim(JwtRegisteredClaimNames.Email, userInfo.Email),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(ClaimTypes.Role, userInfo.RoleName)
+            new(JwtRegisteredClaimNames.Sub, userInfo.UserID.ToString()),
+            new(JwtRegisteredClaimNames.UniqueName, userInfo.UserName),
+            new(JwtRegisteredClaimNames.Email, userInfo.Email),
+            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new(ClaimTypes.Role, userInfo.RoleName)
         };
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));

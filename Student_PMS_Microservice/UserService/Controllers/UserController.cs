@@ -22,8 +22,7 @@ public class UserController(
     private readonly IValidator<UserUpdateDTO> _update = update;
     private readonly ILogger<UserController> _logger = logger;
 
-    [HttpGet]
-    [Route("Page")]
+    [HttpGet("Page")]
     [Produces<ListResult<UserListDTO>>]
     public async Task<IActionResult> GetUsers()
     {
@@ -32,8 +31,7 @@ public class UserController(
         return Ok(response);
     }
 
-    [HttpGet]
-    [Route("Pk/{userId}")]
+    [HttpGet("Pk/{userId}")]
     [Produces<UserUpdateDTO>]
     public async Task<IActionResult> GetUserPk(int userId)
     {
@@ -41,8 +39,7 @@ public class UserController(
         return Ok(response);
     }
 
-    [HttpGet]
-    [Route("View/{userID}")]
+    [HttpGet("View/{userID}")]
     [Produces<UserViewDTO>]
     public async Task<IActionResult> ViewUser([FromRoute] int userID)
     {
@@ -51,8 +48,7 @@ public class UserController(
         return Ok(response);
     }
 
-    [HttpPost]
-    [Route("Insert")]
+    [HttpPost("Insert")]
     [Produces<OperationResultDTO>]
     public async Task<IActionResult> CreateUser([FromBody] UserCreateDTO dto)
     {
@@ -61,8 +57,7 @@ public class UserController(
         return Ok(response);
     }
 
-    [HttpPut]
-    [Route("Update")]
+    [HttpPut("Update")]
     [Produces<OperationResultDTO>]
     public async Task<IActionResult> UpdateUser([FromBody] UserUpdateDTO dto)
     {
@@ -71,8 +66,7 @@ public class UserController(
         return Ok(response);
     }
 
-    [HttpDelete]
-    [Route("Deactivate/{userid}")]
+    [HttpDelete("Deactivate/{userid}")]
     [Produces<OperationResultDTO>]
     public async Task<IActionResult> DeactivateUser([FromRoute] int userid)
     {
@@ -80,8 +74,7 @@ public class UserController(
         return Ok(response);
     }
 
-    [HttpPost]
-    [Route("CreatedAndModifiedBy")]
+    [HttpPost("CreatedAndModifiedBy")]
     [Produces<CreatedAndModifiedDTO>]
     public async Task<IActionResult> CreatedAndModifiedBy(int createdByID, int modifiedByID)
     {
@@ -89,8 +82,7 @@ public class UserController(
         return Ok(response);
     }
 
-    [HttpGet]
-    [Route("ResolveAuditUsers")]
+    [HttpGet("ResolveAuditUsers")]
     [Produces<AuditUsersDTO>]
     public async Task<IActionResult> ResolveAuditUsers([FromQuery] int createdByID, [FromQuery] int? modifiedByID, [FromQuery] int? approvedByID)
     {

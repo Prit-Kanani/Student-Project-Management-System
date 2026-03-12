@@ -1,9 +1,10 @@
-﻿using FluentValidation;
-using ProjectService.DTOs;
 using Comman.DTOs.CommanDTOs;
+using Comman.MicroserviceDTO;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
-using ProjectService.Validation;
+using ProjectService.DTOs;
 using ProjectService.Services.ProjectServices;
+using ProjectService.Validation;
 
 namespace ProjectService.Controllers;
 
@@ -15,7 +16,6 @@ public class ProjectController(
     UpdateValidation updatevalidator
 ) : ControllerBase
 {
-    #region GET PROJECT PAGE
     [HttpGet]
     [Route("Page")]
     [Produces<ListResult<ProjectListDTO>>]
@@ -24,9 +24,7 @@ public class ProjectController(
         var response = await projectServices.GetProjectsPage();
         return Ok(response);
     }
-    #endregion
 
-    #region GET PROJECT VIEW
     [HttpGet]
     [Route("View/{id:int}")]
     [Produces<ProjectViewDTO>]
@@ -35,9 +33,7 @@ public class ProjectController(
         var response = await projectServices.GetProjectView(id);
         return Ok(response);
     }
-    #endregion
 
-    #region GET PROJECT PK
     [HttpGet]
     [Route("PK/{id:int}")]
     [Produces<ProjectViewDTO>]
@@ -46,33 +42,35 @@ public class ProjectController(
         var response = await projectServices.GetProjectPK(id);
         return Ok(response);
     }
-    #endregion
 
-    #region CREATE PROJECT 
+    [HttpGet]
+    [Route("Exists/{id:int}")]
+    [Produces<EntityExistsDTO>]
+    public async Task<IActionResult> ProjectExists(int id)
+    {
+        return Ok(await projectServices.ProjectExists(id));
+    }
+
     [HttpPost]
     [Route("Create")]
     [Produces<OperationResultDTO>]
-    public async Task<IActionResult> CreateProject(ProjectCreateDTO dto)
+    public async Task<IActionResult> CreateProject([FromBody] ProjectCreateDTO dto)
     {
         await insertvalidator.ValidateAndThrowAsync(dto);
         var response = await projectServices.CreateProject(dto);
         return Ok(response);
     }
-    #endregion
 
-    #region UPDATE PROJECT
-    [HttpPost]
+    [HttpPut]
     [Route("Update")]
     [Produces<OperationResultDTO>]
-    public async Task<IActionResult> UpdateProject(ProjectUpdateDTO dto)
+    public async Task<IActionResult> UpdateProject([FromBody] ProjectUpdateDTO dto)
     {
         await updatevalidator.ValidateAndThrowAsync(dto);
         var response = await projectServices.UpdateProject(dto);
         return Ok(response);
     }
-    #endregion
 
-    #region DELETE PROJECT
     [HttpDelete]
     [Route("Delete/{id:int}")]
     [Produces<OperationResultDTO>]
@@ -81,5 +79,4 @@ public class ProjectController(
         var response = await projectServices.DeactivateProject(id);
         return Ok(response);
     }
-    #endregion
 }

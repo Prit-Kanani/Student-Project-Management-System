@@ -1,11 +1,11 @@
-﻿using Comman.DTOs.CommanDTOs;
+using Comman.DTOs.CommanDTOs;
+using Comman.Exceptions;
 using Comman.Functions;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using UserService.DTOs;
-using UserService.Exceptions;
 using UserService.Repository.Auth;
 
 namespace UserService.Services.Auth;
@@ -15,40 +15,39 @@ public class AuthService(
     IAuthRepository authRepository
 ) : IAuthService
 {
-    #region CONFIGURATION]
-    private readonly JwtSettings _jwtSettings = configuration.GetSection("Jwt").Get<JwtSettings>();
-    #endregion CONFIGURATION
+    private readonly JwtSettings _jwtSettings = configuration.GetSection("Jwt").Get<JwtSettings>()
+        ?? throw new InvalidOperationException("JWT configuration is missing.");
 
-    #region LOGIN
     public async Task<AuthResponseDTO> Login(LoginDTO dto)
     {
-        var login = await authRepository.Login(dto.Email) ?? throw new UnauthorizedException("Invalid credentials");
+        var login = await authRepository.Login(dto.Email)
+            ?? throw new UnauthorizedException("Invalid credentials");
+
         var hashPassword = HashPass.HashPassword(dto.Password);
-        if ( login.Password != hashPassword)
+        if (login.Password != hashPassword)
         {
             throw new UnauthorizedException("Invalid credentials");
         }
-        var userInfo =  await UserInfo(dto.Email);
-        var token = GenerateToken(userInfo);
-        var response = new AuthResponseDTO
+
+        var userInfo = await authRepository.UserInfo(dto.Email)
+            ?? throw new UnauthorizedException("Invalid credentials");
+
+        return new AuthResponseDTO
         {
             Message = "Login successful",
-            Token = token
+            Token = GenerateToken(userInfo)
         };
-        return response;
     }
-    #endregion
-    
-    #region GENERATE JWT TOKEN
+
     private string GenerateToken(UserInfoDTO userInfo)
     {
         var claims = new List<Claim>
         {
-            new Claim(JwtRegisteredClaimNames.Sub, userInfo.UserID.ToString()),
-            new Claim(JwtRegisteredClaimNames.UniqueName, userInfo.UserName),
-            new Claim(JwtRegisteredClaimNames.Email, userInfo.Email),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(ClaimTypes.Role, userInfo.RoleName)
+            new(JwtRegisteredClaimNames.Sub, userInfo.UserID.ToString()),
+            new(JwtRegisteredClaimNames.UniqueName, userInfo.UserName),
+            new(JwtRegisteredClaimNames.Email, userInfo.Email),
+            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new(ClaimTypes.Role, userInfo.RoleName)
         };
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));
@@ -64,14 +63,4 @@ public class AuthService(
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
-    #endregion
-
-    #region USER INFO
-    private async Task<UserInfoDTO> UserInfo(string Email)
-    {
-        var response = await authRepository.UserInfo(Email);
-        return response;
-    }
-    #endregion
-
 }

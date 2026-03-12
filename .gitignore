@@ -6,6 +6,9 @@
 # dotenv files
 .env
 
+# Local dotnet CLI home used for sandboxed builds
+Student_PMS_Microservice/.dotnet-home/
+
 # User-specific files
 *.rsuser
 *.suo

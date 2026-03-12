@@ -1,4 +1,4 @@
-﻿using Comman.DTOs.CommanDTOs;
+using Comman.DTOs.CommanDTOs;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using ProjectGroupService.DTOs;
@@ -15,7 +15,6 @@ public class ProjectGroupController(
     UpdateValidation updateValidation
 ) : ControllerBase
 {
-    #region GET PROJECT GROUPS PAGE
     [HttpGet]
     [Route("Page")]
     [Produces<ListResult<ProjectGroupListDTO>>]
@@ -24,9 +23,7 @@ public class ProjectGroupController(
         var response = await projectGroupService.GetProjectGroupsPage();
         return Ok(response);
     }
-    #endregion
 
-    #region GET PROJECT GROUP BY PK
     [HttpGet]
     [Route("PK/{id:int}")]
     [Produces<ProjectGroupUpdateDTO>]
@@ -35,9 +32,7 @@ public class ProjectGroupController(
         var response = await projectGroupService.GetProjectGroupPK(id);
         return Ok(response);
     }
-    #endregion
 
-    #region VIEW PROJECT GROUP
     [HttpGet]
     [Route("View/{id:int}")]
     public async Task<IActionResult> GetProjectGroupView([FromRoute] int id)
@@ -45,9 +40,7 @@ public class ProjectGroupController(
         var response = await projectGroupService.GetProjectGroupView(id);
         return Ok(response);
     }
-    #endregion
 
-    #region CREATE PROJECT GROUP
     [HttpPost]
     [Route("Create")]
     [Produces<OperationResultDTO>]
@@ -57,9 +50,7 @@ public class ProjectGroupController(
         var response = await projectGroupService.CreateProjectGroup(dto);
         return Ok(response);
     }
-    #endregion
 
-    #region UPDATE PROJECT GROUP
     [HttpPost]
     [Route("Update")]
     [Produces<OperationResultDTO>]
@@ -69,16 +60,13 @@ public class ProjectGroupController(
         var response = await projectGroupService.UpdateProjectGroup(dto);
         return Ok(response);
     }
-    #endregion
 
-    #region DELETE PROJECT GROUP
     [HttpDelete]
-    [Route("Delete/{id:int}")]
+    [Route("Deactivate/{id:int}")]
     [Produces<OperationResultDTO>]
     public async Task<IActionResult> DeactivateProjectGroup(int id)
     {
         var response = await projectGroupService.DeactivateProjectGroup(id);
         return Ok(response);
     }
-    #endregion
 }

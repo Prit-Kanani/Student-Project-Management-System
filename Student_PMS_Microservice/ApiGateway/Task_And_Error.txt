@@ -1,0 +1,31 @@
+ApiGateway
+Task And Error Notes
+Generated from repository review on 2026-03-11
+
+Current Scope
+- ApiGateway uses Ocelot and SwaggerForOcelot to route requests to:
+  - UserService
+  - ProjectGroupService
+  - ProjectService
+
+Priority 1 - Errors
+1. Fixed on 2026-03-11:
+   JWT bearer authentication was added to ApiGateway.
+   Ocelot routes now declare AuthenticationOptions with the Bearer provider.
+   Status: ApiGateway build is passing.
+
+Priority 2 - Integration Issues
+1. Gateway route prefix for ProjectGroupService is /api/ProjectGroupService/{everything}, but GroupWiseStudentController inside ProjectGroupService uses api/[controller].
+   Impact: GroupWiseStudent endpoints are not aligned with the gateway's downstream contract.
+
+2. Demo_TestProject is not using the gateway's configured base URL.
+   Gateway base URL is https://localhost:7095.
+   Impact: End-to-end integration through the gateway is not being tested correctly.
+
+Priority 3 - Tasks
+1. Remaining:
+   Verify all downstream controllers use route templates consistent with Ocelot downstream path templates.
+2. Remaining:
+   Add an explicit smoke test path set for gateway-level routing.
+3. Remaining:
+   Confirm Swagger aggregation works for all downstream services after service route fixes.

@@ -11,6 +11,10 @@
           "Port": 7165
         }
       ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
       "SwaggerKey": "UserService"
     },
     {
@@ -24,6 +28,10 @@
           "Port": 7242
         }
       ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
       "SwaggerKey": "ProjectGroupService"
     },
     {
@@ -37,6 +45,10 @@
           "Port": 7096
         }
       ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
       "SwaggerKey": "ProjectService"
     }
   ],

@@ -1,69 +1,59 @@
-﻿using Comman.DTOs.CommanDTOs;
+using Comman.DTOs.CommanDTOs;
+using Comman.MicroserviceDTO;
 using ProjectService.DTOs;
-using ProjectService.Exceptions;
 using ProjectService.Rpository.ProjectRepository;
+using ProjectService.Services.External;
 
 namespace ProjectService.Services.ProjectServices;
 
 public class ProjectService(
-    IProjectRepository repository 
-    /*, MicroserviceGateway gateway*/
+    IProjectRepository repository,
+    UserServiceClient userServiceClient
 ) : IProjectServices
 {
-    #region CONFIGURATION
-
     private readonly IProjectRepository _repository = repository;
+    private readonly UserServiceClient _userServiceClient = userServiceClient;
 
-    #endregion
-
-    #region GET PROJECT PAGE
     public async Task<ListResult<ProjectListDTO>> GetProjectsPage()
     {
-        var response = await _repository.GetProjectsPage();
-        return response;
+        return await _repository.GetProjectsPage();
     }
-    #endregion
 
-    #region GET PROJECT VIEW
     public async Task<ProjectViewDTO> GetProjectView(int projectID)
     {
         var response = await _repository.GetProjectView(projectID);
-        return response ?? throw new NotFoundException("Project not found");
+        var auditUsers = await _userServiceClient.ResolveAuditUsers(response.CreatedByID, response.ModifiedByID, null);
+        response.CreatedBy = auditUsers.CreatedBy;
+        response.ModifiedBy = auditUsers.ModifiedBy;
+        return response;
     }
-    #endregion
 
-    #region GET PROJECT PK
     public async Task<ProjectUpdateDTO> GetProjectPK(int projectID)
     {
-        var response = await _repository.GetProjectPK(projectID)
-                                        ?? throw new NotFoundException("Project not found");
-        return response;
+        return await _repository.GetProjectPK(projectID);
     }
-    #endregion
 
-    #region CREATE PROJECT
     public async Task<OperationResultDTO> CreateProject(ProjectCreateDTO dto)
     {
-        var response = await _repository.CreateProject(dto);
-        return response;
+        return await _repository.CreateProject(dto);
     }
-    #endregion
 
-    #region UPDATE PROJECT
     public async Task<OperationResultDTO> UpdateProject(ProjectUpdateDTO dto)
     {
-        var response = await _repository.UpdateProject(dto)
-                                            ?? throw new NotFoundException("Project not found");
-        return response;
+        return await _repository.UpdateProject(dto);
     }
-    #endregion
 
-    #region DEACTIVATE USER
     public async Task<OperationResultDTO> DeactivateProject(int projectID)
     {
-        var response = await _repository.DeactivateProject(projectID)
-                                            ?? throw new NotFoundException("Project not found");
-        return response;
+        return await _repository.DeactivateProject(projectID);
     }
-    #endregion
+
+    public async Task<EntityExistsDTO> ProjectExists(int projectID)
+    {
+        return new EntityExistsDTO
+        {
+            Id = projectID,
+            Exists = await _repository.ProjectExists(projectID)
+        };
+    }
 }

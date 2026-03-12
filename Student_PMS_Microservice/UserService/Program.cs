@@ -59,6 +59,7 @@ try
             Title = "User Service",
             Version = "v1"
         });
+        options.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
         options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
         {
             Name = "Authorization",

@@ -22,8 +22,7 @@ public class RoleController(
     #endregion
 
     #region GET ROLES
-    [HttpGet]
-    [Route("Page")]
+    [HttpGet("Page")]
     [Produces<ListResult<RoleListDTO>>]
     public async Task<IActionResult> GetRoles()
     {
@@ -33,8 +32,7 @@ public class RoleController(
     #endregion
 
     #region VIEW ROLE
-    [HttpGet]
-    [Route("View/{roleID}")]
+    [HttpGet("View/{roleID}")]
     [Produces<RoleViewDTO>]
     public async Task<IActionResult> ViewRole([FromRoute] int roleID)
     {
@@ -44,8 +42,7 @@ public class RoleController(
     #endregion
 
     #region GET ROLE BY PK
-    [HttpGet]
-    [Route("Pk/{roleID}")]
+    [HttpGet("Pk/{roleID}")]
     [Produces<RoleUpdateDTO>]
     public async Task<IActionResult> GetRolePK([FromRoute] int roleID)
     {
@@ -55,8 +52,7 @@ public class RoleController(
     #endregion
 
     #region GET ROLE DROPDOWN
-    [HttpGet]
-    [Route("Dropdown")]
+    [HttpGet("Dropdown")]
     [Produces<OptionDTO>]
     public async Task<IActionResult> GetRoleDropdown()
     {
@@ -66,8 +62,7 @@ public class RoleController(
     #endregion
 
     #region CREATE ROLE
-    [HttpPost]
-    [Route("Insert")]
+    [HttpPost("Insert")]
     [Produces<OperationResultDTO>]
     public async Task<IActionResult> CreateRole([FromBody] RoleCreateDTO dto)
     {
@@ -78,8 +73,7 @@ public class RoleController(
     #endregion
 
     #region UPDATE ROLE
-    [HttpPut]
-    [Route("Update")]
+    [HttpPut("Update")]
     [Produces<OperationResultDTO>]
     public async Task<IActionResult> UpdateRole([FromBody] RoleUpdateDTO dto)
     {
@@ -90,8 +84,7 @@ public class RoleController(
     #endregion
 
     #region DEACTIVATE ROLE
-    [HttpDelete]
-    [Route("Deactivate/{roleId}")]
+    [HttpDelete("Deactivate/{roleId}")]
     [Produces<OperationResultDTO>]
     public async Task<IActionResult> DeactivateRole([FromRoute] int roleId)
     {

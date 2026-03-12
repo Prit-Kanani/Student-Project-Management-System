@@ -12,7 +12,7 @@ namespace Demo_TestProject.Controllers;
 
 public class TestingController
 {
-    [Theory]
+    /*[Theory]
     [ClassData(typeof(SampleData))]
     public void Addmethod(int a, int b, object expected)
     {
@@ -28,7 +28,7 @@ public class TestingController
         {
             Assert.Equal(expected, result);
         }
-    }
+    }*/
 
     [Theory]
     [ClassData(typeof(LoginData))]

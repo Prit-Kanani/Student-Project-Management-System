@@ -231,7 +231,7 @@ try
     var app = builder.Build();
 
     // request logging middleware depends on Serilog services registered above
-    app.UseDeveloperExceptionPage();
+    //app.UseDeveloperExceptionPage();
     //app.UseSerilogRequestLogging();
 
     // Configure the HTTP request pipeline.

@@ -1,6 +1,6 @@
 ApiGateway
 Task And Error Notes
-Updated on 2026-03-13
+Updated on 2026-03-16
 
 Current Scope
 - ApiGateway uses Ocelot and SwaggerForOcelot to route requests to:
@@ -32,6 +32,16 @@ Priority 1 - Completed Fixes
    Why:
    - It caused startup failure when no explicit dev certificate was available.
 
+5. Completed on 2026-03-16:
+   Development JWT settings were aligned with UserService.
+   Fix:
+   - ApiGateway/appsettings.Development.json secret was updated to the current shared secret.
+   Result:
+   - Gateway token validation mismatch in Development is resolved.
+
+6. Completed on 2026-03-16:
+   Gateway bearer-token authentication path is confirmed working by user testing.
+
 Priority 2 - Current Known Risk
 1. Gateway startup must still be verified on the local machine after restart.
    Current situation:
@@ -40,17 +50,7 @@ Priority 2 - Current Known Risk
    Impact:
    - If the gateway still does not launch locally, the next thing to check is local dev-certificate state and stale running processes
 
-2. Gateway authentication must be verified through real requests after restart.
-   Current situation:
-   - Source-side bearer mapping is now present
-   - Runtime verification is still needed for actual forwarded authenticated requests
-
 Priority 3 - Remaining Tasks
-1. Confirm one authenticated gateway request works for:
-   - UserService
-   - ProjectService
-   - ProjectGroupService
+1. If HTTPS launch still fails locally, repair local dev-certificate state and rebuild cleanly.
 
-2. If HTTPS launch still fails locally, repair local dev-certificate state and rebuild cleanly.
-
-3. Add a small gateway smoke test set if you want repeatable route/auth verification.
+2. Add a small gateway smoke test set if you want repeatable route/auth verification.

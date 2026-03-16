@@ -1,6 +1,6 @@
 Student PMS Microservice
 Global Tasks And Errors
-Updated on 2026-03-13
+Updated on 2026-03-16
 
 Purpose
 - This file tracks cross-project status, shared integration work, and remaining system-level risks.
@@ -44,6 +44,17 @@ Priority 2 - Completed Global Work
    ApiGateway source now includes SwaggerForOcelot bearer mapping and gateway-side bearer security definitions.
    Status: Implemented in ApiGateway/Program.cs.
 
+5. Completed on 2026-03-16:
+   ApiGateway Development JWT settings were aligned with UserService JWT settings.
+   Fix:
+   - ApiGateway/appsettings.Development.json secret was updated to match UserService.
+   Result:
+   - Gateway token validation issue (401 due to mismatched secret in Development) is resolved.
+
+6. Completed on 2026-03-16:
+   ApiGateway authenticated routing with bearer token was runtime-verified by the user.
+   Status: Confirmed working.
+
 Priority 3 - Current Global Risks
 1. ApiGateway runtime/startup is still environment-sensitive.
    Current code fix:
@@ -53,25 +64,17 @@ Priority 3 - Current Global Risks
    Impact:
    - Gateway startup on a machine must be verified after clean stop/rebuild/restart.
 
-2. ApiGateway end-to-end authentication still requires runtime verification after restart.
-   Current code status:
-   - Ocelot routes use AuthenticationProviderKey = Bearer.
-   - ApiGateway now maps the Ocelot auth key to SwaggerForOcelot bearer security.
-   Remaining task:
-   - Verify gateway requests actually forward authenticated calls successfully after a clean local restart.
-
-3. RabbitMQ/eventing remains unfinished.
+2. RabbitMQ/eventing remains unfinished.
    Affected area:
    - UserService/RabbitMQ
    Impact:
    - Messaging is not a reliable current system capability.
 
-4. Demo integration tests remain environment-dependent.
+3. Demo integration tests remain environment-dependent.
    Impact:
    - Cross-service behavior is still not protected by a controlled automated integration test setup.
 
 Priority 4 - Current Suggested Order
 1. Restart and verify ApiGateway locally after clearing stale output/debug sessions.
-2. Verify one authenticated request through ApiGateway for each protected downstream service.
-3. Decide whether RabbitMQ is required; either implement fully or remove the dead/commented code.
-4. Replace live-environment integration tests with controlled integration infrastructure.
+2. Decide whether RabbitMQ is required; either implement fully or remove the dead/commented code.
+3. Replace live-environment integration tests with controlled integration infrastructure.

@@ -1,30 +1,31 @@
 Student PMS Microservice
 Global Tasks And Errors
-Updated on 2026-03-11
+Updated on 2026-03-13
 
 Purpose
-- This file tracks cross-project and service-to-service issues across the full microservice solution.
-- Project-specific details are stored in each project's Task_And_Error.txt file.
+- This file tracks cross-project status, shared integration work, and remaining system-level risks.
+- Project-specific details are tracked in each project's Task_And_Error.txt file.
 
-Priority 1 - Cross-Service Work Completed
-1. Fixed on 2026-03-11:
-   ProjectService now resolves CreatedByID and ModifiedByID display names by calling UserService.
-   Status: Implemented in code through ProjectService/Services/External/UserServiceClient.cs and ProjectService service layer.
+Priority 1 - System State Right Now
+1. Current code status:
+   Core service code is in a much better state than the initial review.
+   UserService, ProjectService, ProjectGroupService, ApiGateway, Comman, and Demo_TestProject all received direct fixes.
 
-2. Fixed on 2026-03-11:
-   ProjectGroupService now resolves CreatedByID, ModifiedByID, and ApprovedByID display names by calling UserService.
-   Status: Implemented in code through ProjectGroupService/Services/External/UserServiceClient.cs and service layer enrichment.
+2. Current auth status:
+   JWT token creation is implemented in UserService and the main service controllers are protected with [Authorize].
+   Login and register are kept anonymous through AuthController.
 
-3. Fixed on 2026-03-11:
-   ProjectGroupService now validates ProjectID by calling ProjectService before create and update flows in ProjectGroupByProject.
-   Status: Implemented in code through ProjectGroupService/Services/External/ProjectServiceClient.cs.
+3. Current cross-service status:
+   ProjectService and ProjectGroupService call UserService to resolve CreatedByID, ModifiedByID, and ApprovedByID display names.
+   ProjectGroupService also calls ProjectService to validate ProjectID.
 
-4. Fixed on 2026-03-11:
-   Shared API exception types were moved into Comman and reused across services.
-   Status: Implemented in code through Comman/Exceptions/ApiException.cs.
+Priority 2 - Completed Global Work
+1. Completed:
+   Shared API exception types were centralized in Comman.
+   Status: Implemented in Comman/Exceptions/ApiException.cs and reused in services.
 
-5. Fixed on 2026-03-11:
-   Confirmed-unused placeholder microservice client files and other dead code were removed.
+2. Completed:
+   Placeholder cross-service client files and other confirmed-unused code were removed.
    Removed items:
    - UserService/Services/UserService/UserMicroservice.cs
    - ProjectService/Services/ProjectServices/ProjectMicroservices.cs
@@ -32,29 +33,45 @@ Priority 1 - Cross-Service Work Completed
    - Comman/Functions/OptionMapper.cs
    - ProjectGroupService/Services/ProjectGroupByProject/Validation/InsertProjectGroupByProjectValidation.cs
 
-Priority 2 - Current Environment Limitation
-1. Build verification is currently blocked in this execution environment because NuGet restore cannot reach https://api.nuget.org/v3/index.json.
-   Observed on 2026-03-11 while running dotnet build for:
-   - UserService/UserService.csproj
-   - ProjectService/ProjectService.csproj
-   - ProjectGroupService/ProjectGroupService.csproj
-   Impact: Code changes were applied, but a fresh build could not be fully re-verified in this sandbox after the latest edits.
+3. Completed:
+   Individual services now expose Swagger bearer configuration where needed.
+   Status:
+   - UserService: present
+   - ProjectService: added
+   - ProjectGroupService: added
 
-Priority 3 - Remaining Global Work
-1. RabbitMQ integration is still present only as commented-out code.
-   Affected files:
-   - UserService/RabbitMQ/GlobalMessageSubscriber.cs
-   - UserService/RabbitMQ/MessageBusClient.cs
-   Impact: Messaging/event-driven integration is unfinished.
+4. Completed:
+   ApiGateway source now includes SwaggerForOcelot bearer mapping and gateway-side bearer security definitions.
+   Status: Implemented in ApiGateway/Program.cs.
 
-2. Some controllers and endpoints still have inconsistent validation coverage.
-   Impact: Validation behavior is not yet fully standardized across all services.
+Priority 3 - Current Global Risks
+1. ApiGateway runtime/startup is still environment-sensitive.
+   Current code fix:
+   - The hardcoded Kestrel HTTPS listener was removed from ApiGateway/Program.cs.
+   Current remaining risk:
+   - Local launch can still fail if stale output is running or if the local HTTPS developer certificate is missing/outdated.
+   Impact:
+   - Gateway startup on a machine must be verified after clean stop/rebuild/restart.
 
-3. Demo_TestProject integration tests are still environment-dependent and skipped by default.
-   Impact: Cross-service behavior is not yet verified by a controlled automated integration setup.
+2. ApiGateway end-to-end authentication still requires runtime verification after restart.
+   Current code status:
+   - Ocelot routes use AuthenticationProviderKey = Bearer.
+   - ApiGateway now maps the Ocelot auth key to SwaggerForOcelot bearer security.
+   Remaining task:
+   - Verify gateway requests actually forward authenticated calls successfully after a clean local restart.
 
-Suggested Fix Order
-1. Re-run restore/build in an environment with NuGet access and verify the latest cross-service changes.
-2. Decide whether RabbitMQ is required; if yes, implement it fully, otherwise remove dead code.
-3. Standardize validation coverage across remaining endpoints.
-4. Replace skipped environment-dependent integration tests with controlled integration infrastructure.
+3. RabbitMQ/eventing remains unfinished.
+   Affected area:
+   - UserService/RabbitMQ
+   Impact:
+   - Messaging is not a reliable current system capability.
+
+4. Demo integration tests remain environment-dependent.
+   Impact:
+   - Cross-service behavior is still not protected by a controlled automated integration test setup.
+
+Priority 4 - Current Suggested Order
+1. Restart and verify ApiGateway locally after clearing stale output/debug sessions.
+2. Verify one authenticated request through ApiGateway for each protected downstream service.
+3. Decide whether RabbitMQ is required; either implement fully or remove the dead/commented code.
+4. Replace live-environment integration tests with controlled integration infrastructure.

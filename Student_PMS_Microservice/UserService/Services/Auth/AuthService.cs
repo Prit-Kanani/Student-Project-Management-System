@@ -7,12 +7,14 @@ using System.Security.Claims;
 using System.Text;
 using UserService.DTOs;
 using UserService.Repository.Auth;
+using UserService.Repository.UserRepository;
 
 namespace UserService.Services.Auth;
 
 public class AuthService(
     IConfiguration configuration,
-    IAuthRepository authRepository
+    IAuthRepository authRepository,
+    IUserRepository userRepository
 ) : IAuthService
 {
     private readonly JwtSettings _jwtSettings = configuration.GetSection("Jwt").Get<JwtSettings>()
@@ -39,16 +41,27 @@ public class AuthService(
         };
     }
 
+    public async Task<OperationResultDTO> Register(UserCreateDTO dto)
+    {
+        return await userRepository.CreateUser(dto);
+    }
+
     private string GenerateToken(UserInfoDTO userInfo)
     {
         var claims = new List<Claim>
         {
             new(JwtRegisteredClaimNames.Sub, userInfo.UserID.ToString()),
+            new(ClaimTypes.NameIdentifier, userInfo.UserID.ToString()),
+            new(ClaimTypes.Name, userInfo.UserName),
             new(JwtRegisteredClaimNames.UniqueName, userInfo.UserName),
             new(JwtRegisteredClaimNames.Email, userInfo.Email),
-            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new(ClaimTypes.Role, userInfo.RoleName)
+            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
+
+        if (!string.IsNullOrWhiteSpace(userInfo.RoleName))
+        {
+            claims.Add(new Claim(ClaimTypes.Role, userInfo.RoleName));
+        }
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

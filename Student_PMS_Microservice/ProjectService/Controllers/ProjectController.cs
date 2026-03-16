@@ -1,6 +1,7 @@
 using Comman.DTOs.CommanDTOs;
 using Comman.MicroserviceDTO;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProjectService.DTOs;
 using ProjectService.Services.ProjectServices;
@@ -10,6 +11,7 @@ namespace ProjectService.Controllers;
 
 [Route("api/ProjectService/[controller]")]
 [ApiController]
+[Authorize]
 public class ProjectController(
     IProjectServices projectServices,
     InsertValidation insertvalidator,

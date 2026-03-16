@@ -1,41 +1,33 @@
 Demo_TestProject
 Task And Error Notes
-Generated from repository review on 2026-03-11
+Updated on 2026-03-13
 
-Priority 1 - Critical Errors
-1. Fixed on 2026-03-11:
-   IntegrationTesting.cs no longer uses HttpContent.ReadAsAsync(...).
-   Status: Resolved in code.
+Priority 1 - Completed Fixes
+1. Completed:
+   Unsupported ReadAsAsync usage was replaced.
 
-2. Fixed on 2026-03-11:
-   Compile-time test DTO and deserialization mismatches were corrected.
-   Status: Resolved in code.
+2. Completed:
+   DTO/result assertions were aligned with the shared contracts.
 
-Priority 2 - Test Design Errors
-1. Fixed on 2026-03-11:
-   Base URL now targets ApiGateway at https://localhost:7095/api/UserService/User.
-   Status: Resolved in code.
+3. Completed:
+   Test base URL was aligned to the gateway contract.
 
-2. Fixed on 2026-03-11:
-   Tests now use ListResult<T>.Items instead of Data.
-   Status: Resolved in code.
+4. Completed:
+   OperationResultDTO assertions were aligned to the current DTO shape.
 
-3. Tests assume fixed records already exist, such as user ID 1 and role ID 1.
-   Impact: Tests are environment-dependent and fragile.
+Priority 2 - Current Known Limitations
+1. Integration tests still depend on a live environment.
+   Impact:
+   - They are not isolated or stable across machines
 
-4. Tests hit a running external service directly with HttpClient instead of using WebApplicationFactory or controlled integration setup.
-   Impact: Tests are not isolated or repeatable.
+2. Some tests assume seeded/fixed records exist.
+   Impact:
+   - They are fragile and environment-specific
 
-5. Fixed on 2026-03-11:
-   OperationResultDTO assertions were aligned to Id and RowsAffected.
-   Status: Resolved in code.
+3. Integration tests are currently skipped by default.
+   Impact:
+   - They do not give regular automated protection right now
 
-Priority 3 - Tasks
-1. Fixed on 2026-03-11:
-   ReadAsAsync was replaced with supported JSON deserialization.
-2. Remaining:
-   Replace environment-dependent tests with controlled seeded setup or WebApplicationFactory-based integration tests.
-3. Remaining:
-   Decide whether this project should remain an integration test project or be split into unit and integration test layers.
-4. Remaining:
-   Integration tests are currently marked skipped by default because they require a live environment.
+Priority 3 - Remaining Tasks
+1. Decide whether this project should remain live-environment integration only, or be split into unit and controlled integration layers.
+2. Replace live-environment assumptions with seeded or WebApplicationFactory-based integration setup.

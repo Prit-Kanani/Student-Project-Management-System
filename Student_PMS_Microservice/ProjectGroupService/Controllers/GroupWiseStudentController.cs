@@ -1,4 +1,5 @@
 using Comman.DTOs.CommanDTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProjectGroupService.DTOs;
 using ProjectGroupService.Services.GroupWiseStudent;
@@ -7,6 +8,7 @@ namespace ProjectGroupService.Controllers;
 
 [Route("api/ProjectGroupService/[controller]")]
 [ApiController]
+[Authorize]
 public class GroupWiseStudentController(
     IGroupWiseStudentService groupWiseStudentService
 ) : ControllerBase

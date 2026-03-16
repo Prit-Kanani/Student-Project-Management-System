@@ -1,52 +1,53 @@
 ProjectService
 Task And Error Notes
-Updated on 2026-03-11
+Updated on 2026-03-13
 
 Priority 1 - Completed Runtime Fixes
-1. Fixed on 2026-03-11:
-   Program.cs now registers:
-   - IProjectServices
+1. Completed:
+   Program.cs now registers the required services and validators.
+   Status:
    - IProjectRepository
+   - IProjectServices
    - InsertValidation
    - UpdateValidation
-   Status: Resolved in code.
 
-2. Fixed on 2026-03-11:
-   ProjectRepository.GetProjectView now awaits FirstOrDefaultAsync correctly.
-   Status: Resolved in code.
+2. Completed:
+   ProjectRepository.GetProjectView async read logic was fixed.
 
-3. Fixed on 2026-03-11:
-   ProjectController update endpoint now uses PUT and explicit [FromBody] binding.
-   Status: Resolved in code.
+3. Completed:
+   ProjectController update endpoint uses PUT and explicit body binding.
 
-Priority 2 - Completed Cross-Service Integration
-1. Fixed on 2026-03-11:
-   ProjectService now calls UserService to resolve CreatedByID and ModifiedByID names for project view responses.
-   Status: Implemented in code through Services/External/UserServiceClient.cs.
+4. Completed:
+   JWT authentication is configured and ProjectController is protected with [Authorize].
 
-2. Fixed on 2026-03-11:
-   ProjectService now exposes a ProjectID existence endpoint for downstream validation.
-   Status: Implemented in code through ProjectController and service/repository contracts.
+5. Completed:
+   Swagger bearer configuration is now present.
 
-3. Fixed on 2026-03-11:
-   The unused ProjectMicroservices placeholder file was removed.
-   Status: Resolved in code.
+Priority 2 - Completed Cross-Service Work
+1. Completed:
+   ProjectService resolves CreatedByID and ModifiedByID names by calling UserService.
 
-4. Fixed on 2026-03-11:
-   Shared API exception handling now uses Comman exceptions instead of service-local ApiException copies.
-   Status: Resolved in code.
+2. Completed:
+   ProjectService exposes a ProjectID existence endpoint for downstream validation.
 
-Priority 3 - Remaining Work
-1. DeactivateProject uses Delete in the controller but performs a soft delete by setting IsActive = false.
-   Impact: Behavior is valid, but should be documented consistently as a soft delete.
+3. Completed:
+   Shared API exception handling now uses Comman exceptions.
 
-2. Startup configuration is still minimal compared with UserService.
-   Impact: Validation and middleware patterns are not fully standardized across services.
+4. Completed:
+   Unused placeholder microservice file was removed.
 
-Priority 4 - Environment Note
-1. Fresh build verification after the latest changes is blocked in this environment because NuGet restore cannot reach api.nuget.org.
+Priority 3 - Current Remaining Work
+1. Delete endpoint behavior is a soft delete.
+   Current behavior:
+   - controller route says Delete
+   - data path sets IsActive = false
+   Impact:
+   - The contract should stay documented clearly as a soft delete
 
-Suggested Next Steps
-1. Re-run `dotnet build ProjectService/ProjectService.csproj` in a network-enabled environment.
-2. Document the delete endpoint clearly as a soft delete.
-3. Standardize startup/middleware/validation patterns if you want closer parity with UserService.
+2. Startup/middleware patterns are simpler than UserService.
+   Impact:
+   - This is not broken, but service setup is not fully standardized across projects
+
+Priority 4 - Next Checks
+1. Verify one authenticated ProjectService call directly.
+2. Verify the same call through ApiGateway once gateway runtime verification is complete.

@@ -1,54 +1,53 @@
 ProjectGroupService
 Task And Error Notes
-Updated on 2026-03-11
+Updated on 2026-03-13
 
 Priority 1 - Completed Logic Fixes
-1. Fixed on 2026-03-11:
-   ProjectGroupRepository.GetProjectGroupView now awaits FirstOrDefaultAsync correctly.
-   Status: Resolved in code.
+1. Completed:
+   ProjectGroupRepository.GetProjectGroupView async read logic was fixed.
 
-2. Fixed on 2026-03-11:
-   GroupWiseStudentRepository.GetGroupWiseStudentView now awaits FirstOrDefaultAsync correctly.
-   Status: Resolved in code.
+2. Completed:
+   GroupWiseStudentRepository.GetGroupWiseStudentView async read logic was fixed.
 
-3. Fixed on 2026-03-11:
-   GroupWiseStudentRepository.DeactivateGroupWiseStudent now returns StudentWiseGroupID as the response Id.
-   Status: Resolved in code.
+3. Completed:
+   GroupWiseStudentRepository deactivate response now returns the correct entity Id.
 
-4. Fixed on 2026-03-11:
-   ProjectGroupByProjectRepository now uses single-record Dapper reads for view/PK fetches.
-   Status: Resolved in code.
+4. Completed:
+   ProjectGroupByProjectRepository single-record Dapper fetch logic was corrected.
 
-Priority 2 - Completed Cross-Service Integration
-1. Fixed on 2026-03-11:
-   ProjectGroupService now calls UserService to resolve CreatedByID, ModifiedByID, and ApprovedByID names for view responses.
-   Status: Implemented in code through Services/External/UserServiceClient.cs and service layer enrichment.
+5. Completed:
+   Authenticated ModifiedByID handling was added for ProjectGroupByProject deactivation.
 
-2. Fixed on 2026-03-11:
-   ProjectGroupService now calls ProjectService to validate ProjectID before create and update flows in ProjectGroupByProject.
-   Status: Implemented in code through Services/External/ProjectServiceClient.cs.
+Priority 2 - Completed Service and Auth Work
+1. Completed:
+   ProjectGroupService resolves CreatedByID, ModifiedByID, and ApprovedByID by calling UserService.
 
-3. Fixed on 2026-03-11:
-   JWT authentication is configured and ProjectGroupByProject deactivation reads ModifiedByID from authenticated user claims.
-   Status: Resolved in code.
+2. Completed:
+   ProjectGroupService validates ProjectID through ProjectService before create/update flows in ProjectGroupByProject.
 
-4. Fixed on 2026-03-11:
-   The unused ProjectMicroservices placeholder file and empty validation placeholder file were removed.
-   Status: Resolved in code.
+3. Completed:
+   JWT authentication is configured and main controllers are protected with [Authorize].
+   Protected controllers:
+   - ProjectGroupController
+   - ProjectGroupByProjectController
+   - GroupWiseStudentController
 
-5. Fixed on 2026-03-11:
-   Shared API exception handling now uses Comman exceptions instead of service-local ApiException copies.
-   Status: Resolved in code.
+4. Completed:
+   Swagger bearer configuration is now present.
 
-Priority 3 - Remaining Work
-1. Review whether create/update GroupWiseStudent endpoints also need explicit validation classes for parity with ProjectGroup endpoints.
+5. Completed:
+   Shared API exception handling now uses Comman exceptions.
 
-2. ProjectGroupController delete route behavior should remain documented as a soft delete if that is the intended contract.
+6. Completed:
+   Unused placeholder service files were removed.
 
-Priority 4 - Environment Note
-1. Fresh build verification after the latest changes is blocked in this environment because NuGet restore cannot reach api.nuget.org.
+Priority 3 - Current Remaining Work
+1. GroupWiseStudent create/update currently does not have the same explicit validator pattern as ProjectGroup endpoints.
+   Impact:
+   - Validation coverage is not fully standardized across this service
 
-Suggested Next Steps
-1. Re-run `dotnet build ProjectGroupService/ProjectGroupService.csproj` in a network-enabled environment.
-2. Add or confirm GroupWiseStudent validation if you want parity with the other slices.
-3. Decide whether additional downstream enrichment is needed beyond user names and ProjectID validation.
+2. Delete/deactivate behavior should remain documented as soft delete where applicable.
+
+Priority 4 - Next Checks
+1. Verify bearer token flow directly in ProjectGroupService Swagger after restart.
+2. Verify one authenticated ProjectGroupService request through ApiGateway after gateway runtime verification.

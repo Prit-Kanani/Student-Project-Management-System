@@ -1,4 +1,3 @@
-using Comman.Functions;
 using Microsoft.EntityFrameworkCore;
 using ProjectGroup.Data;
 using UserService.DTOs;
@@ -13,16 +12,27 @@ public class AuthRepository(
 
     public async Task<LoginDTO?> Login(string email)
     {
-        var login = await _context.User.FirstOrDefaultAsync(x => x.Email == email && x.IsActive);
-        return login is null ? null : ReflectionMapper.Map<LoginDTO>(login);
+        return await _context.User
+            .Where(x => x.Email == email && x.IsActive)
+            .Select(x => new LoginDTO
+            {
+                Email = x.Email,
+                Password = x.Password
+            })
+            .FirstOrDefaultAsync();
     }
 
     public async Task<UserInfoDTO?> UserInfo(string email)
     {
-        var user = await _context.User
-            .Include(u => u.Role)
-            .FirstOrDefaultAsync(u => u.Email == email && u.IsActive);
-
-        return user is null ? null : ReflectionMapper.Map<UserInfoDTO>(user);
+        return await _context.User
+            .Where(u => u.Email == email && u.IsActive)
+            .Select(u => new UserInfoDTO
+            {
+                UserID = u.UserID,
+                UserName = u.Name,
+                Email = u.Email,
+                RoleName = u.Role != null ? u.Role.RoleName : string.Empty
+            })
+            .FirstOrDefaultAsync();
     }
 }

@@ -2,6 +2,7 @@ using Comman.DTOs.CommanDTOs;
 using Comman.Functions;
 using Comman.MicroserviceDTO;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProjectGroup.Services.UserService;
 using UserService.DTOs;
@@ -10,6 +11,7 @@ namespace UserService.Controllers;
 
 [Route("api/UserService/[controller]")]
 [ApiController]
+[Authorize]
 public class UserController(
     IUserService userService,
     IValidator<UserCreateDTO> create,

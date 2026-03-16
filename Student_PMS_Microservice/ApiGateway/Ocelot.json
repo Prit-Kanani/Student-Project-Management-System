@@ -14,6 +14,19 @@
       "SwaggerKey": "UserService"
     },
     {
+      "UpstreamPathTemplate": "/api/Auth/register",
+      "UpstreamHttpMethod": [ "POST" ],
+      "DownstreamPathTemplate": "/api/Auth/register",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7165
+        }
+      ],
+      "SwaggerKey": "UserService"
+    },
+    {
       "UpstreamPathTemplate": "/api/UserService/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
       "DownstreamPathTemplate": "/api/UserService/{everything}",

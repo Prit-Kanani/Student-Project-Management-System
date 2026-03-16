@@ -1,31 +1,56 @@
 ApiGateway
 Task And Error Notes
-Generated from repository review on 2026-03-11
+Updated on 2026-03-13
 
 Current Scope
 - ApiGateway uses Ocelot and SwaggerForOcelot to route requests to:
   - UserService
-  - ProjectGroupService
   - ProjectService
+  - ProjectGroupService
 
-Priority 1 - Errors
-1. Fixed on 2026-03-11:
-   JWT bearer authentication was added to ApiGateway.
-   Ocelot routes now declare AuthenticationOptions with the Bearer provider.
-   Status: ApiGateway build is passing.
+Priority 1 - Completed Fixes
+1. Completed:
+   JWT bearer authentication is configured in ApiGateway.
+   Status:
+   - Bearer auth registration exists in Program.cs
+   - Ocelot protected routes use AuthenticationProviderKey = Bearer
 
-Priority 2 - Integration Issues
-1. Gateway route prefix for ProjectGroupService is /api/ProjectGroupService/{everything}, but GroupWiseStudentController inside ProjectGroupService uses api/[controller].
-   Impact: GroupWiseStudent endpoints are not aligned with the gateway's downstream contract.
+2. Completed:
+   SwaggerForOcelot bearer mapping was added.
+   Status:
+   - AddAuthenticationProviderKeyMapping("Bearer", "Bearer") is present in Program.cs
+   - Gateway Swagger security definition is present
 
-2. Demo_TestProject is not using the gateway's configured base URL.
-   Gateway base URL is https://localhost:7095.
-   Impact: End-to-end integration through the gateway is not being tested correctly.
+3. Completed:
+   Duplicate auth-route overlap was removed from the gateway contract.
+   Status:
+   - Login and register are exposed as /api/Auth/login and /api/Auth/register
+   - Protected service traffic remains under /api/UserService, /api/ProjectService, /api/ProjectGroupService
 
-Priority 3 - Tasks
-1. Remaining:
-   Verify all downstream controllers use route templates consistent with Ocelot downstream path templates.
-2. Remaining:
-   Add an explicit smoke test path set for gateway-level routing.
-3. Remaining:
-   Confirm Swagger aggregation works for all downstream services after service route fixes.
+4. Completed:
+   The hardcoded Kestrel HTTPS listener was removed.
+   Why:
+   - It caused startup failure when no explicit dev certificate was available.
+
+Priority 2 - Current Known Risk
+1. Gateway startup must still be verified on the local machine after restart.
+   Current situation:
+   - Source code builds
+   - The main observed blocker was stale output/running process behavior and local HTTPS certificate sensitivity
+   Impact:
+   - If the gateway still does not launch locally, the next thing to check is local dev-certificate state and stale running processes
+
+2. Gateway authentication must be verified through real requests after restart.
+   Current situation:
+   - Source-side bearer mapping is now present
+   - Runtime verification is still needed for actual forwarded authenticated requests
+
+Priority 3 - Remaining Tasks
+1. Confirm one authenticated gateway request works for:
+   - UserService
+   - ProjectService
+   - ProjectGroupService
+
+2. If HTTPS launch still fails locally, repair local dev-certificate state and rebuild cleanly.
+
+3. Add a small gateway smoke test set if you want repeatable route/auth verification.

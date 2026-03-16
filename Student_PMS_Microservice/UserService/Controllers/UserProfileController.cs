@@ -1,5 +1,6 @@
 using Comman.DTOs.CommanDTOs;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using UserService.DTOs;
 using UserService.Services.UserProfile;
@@ -8,6 +9,7 @@ namespace UserService.Controllers;
 
 [Route("api/UserService/[controller]")]
 [ApiController]
+[Authorize]
 public class UserProfileController(
     IUserProfileService userProfileService,
     IValidator<UserProfileCreateDTO> createValidator,

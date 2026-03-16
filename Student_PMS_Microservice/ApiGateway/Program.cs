@@ -1,6 +1,7 @@
 using Comman.DTOs.CommanDTOs;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using MMLib.Ocelot.Provider.AppConfiguration;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
@@ -24,8 +25,12 @@ if (string.IsNullOrWhiteSpace(jwtSettings.SecretKey) ||
     throw new InvalidOperationException("Jwt configuration is incomplete.");
 }
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer("Bearer", options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {
@@ -45,30 +50,37 @@ builder.Services.AddAuthorization();
 builder.Services.AddOcelot(builder.Configuration)
     .AddAppConfiguration();
 
-builder.Services.AddSwaggerForOcelot(builder.Configuration);
-
-builder.Services.AddControllers();
-
-builder.WebHost.UseKestrel(kestrelOptions =>
+builder.Services.AddSwaggerForOcelot(builder.Configuration, options =>
 {
-    kestrelOptions.ListenAnyIP(7095, listenOptions =>
+    options.AddAuthenticationProviderKeyMapping("Bearer", "Bearer");
+    options.GenerateDocsDocsForGatewayItSelf(opt =>
     {
-        listenOptions.UseHttps();
+        opt.GatewayDocsTitle = "API Gateway";
+        opt.GatewayDocsOpenApiInfo = new OpenApiInfo
+        {
+            Title = "API Gateway",
+            Version = "v1"
+        };
     });
 });
 
+builder.Services.AddControllers();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    app.UseSwagger();
     app.UseSwaggerForOcelotUI(opt =>
     {
         opt.PathToSwaggerGenerator = "/swagger/docs";
+    }, uiOpt =>
+    {
+        uiOpt.DocumentTitle = "API Gateway";
     });
 }
 

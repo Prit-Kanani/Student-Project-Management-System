@@ -51,6 +51,21 @@ public class UserRepository(
 
     public async Task<OperationResultDTO> CreateUser(UserCreateDTO dto)
     {
+        var emailExists = await context.User.AnyAsync(u => u.Email == dto.Email);
+        if (emailExists)
+        {
+            throw new BadRequestException("A user with this email already exists");
+        }
+
+        if (dto.RoleID.HasValue)
+        {
+            var roleExists = await context.Role.AnyAsync(r => r.RoleID == dto.RoleID.Value);
+            if (!roleExists)
+            {
+                throw new BadRequestException("Selected role does not exist");
+            }
+        }
+
         var user = dto.Adapt<User>();
         user.Created = DateTime.UtcNow;
         user.Password = HashPass.HashPassword(dto.Password);

@@ -59,7 +59,6 @@ try
             Title = "User Service",
             Version = "v1"
         });
-        options.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
         options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
         {
             Name = "Authorization",
@@ -67,7 +66,7 @@ try
             Scheme = "Bearer",
             BearerFormat = "JWT",
             In = ParameterLocation.Header,
-            Description = "Enter your valid token in the text input below.\r\n\r\nExample: \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\""
+            Description = "Enter your JWT token directly."
         });
         options.AddSecurityRequirement(new OpenApiSecurityRequirement
         {
@@ -80,7 +79,7 @@ try
                         Id = "Bearer"
                     }
                 },
-                new string[] {}
+                Array.Empty<string>()
             }
         });
     });

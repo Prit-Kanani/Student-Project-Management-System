@@ -1,24 +1,34 @@
 Comman
 Task And Error Notes
-Generated from repository review on 2026-03-11
+Updated on 2026-03-13
 
 Current Scope
-- Shared DTOs and helper mappers used across services.
+- Shared DTOs, response contracts, and common exception types used across services.
 
-Priority 1 - Errors
-1. No compile blocker was found inside Comman itself.
+Priority 1 - Completed Shared Work
+1. Completed:
+   Shared API exception types now live in Comman.
+   Status:
+   - ApiException and related exception classes are present in Comman/Exceptions/ApiException.cs
 
-Priority 2 - Shared Contract Issues
-1. ListResult<T> exposes:
-   - TotalCount
-   - Items
-   But Demo_TestProject expects a Data property.
-   Impact: Shared response contract and tests are currently inconsistent.
+2. Completed:
+   The earlier StatusCodes reference issue in ApiException.cs was fixed by importing Microsoft.AspNetCore.Http.
 
-2. JwtSettings properties are non-nullable and currently generate nullable warnings.
-   Impact: Misconfiguration can lead to runtime null-reference failures in services that bind JWT settings.
+3. Completed:
+   Earlier ListResult<T> test mismatch was addressed on the test side.
+   Current contract:
+   - ListResult<T> uses Items
+   - Demo_TestProject was updated to match it
 
-Priority 3 - Tasks
-1. Decide whether ListResult<T> should keep Items or switch to a different response property name.
-2. Tighten DTO nullability using required or nullable reference types where appropriate.
-3. Review ReflectionMapper assumptions for list wrappers and single-item mapping to ensure all consumers match the shared DTO contract.
+Priority 2 - Current Remaining Work
+1. Reflection-based mapping assumptions should still be treated carefully.
+   Impact:
+   - Future DTO/entity drift can create hidden runtime mapping problems
+
+2. Shared DTO contract naming should remain stable from here.
+   Impact:
+   - If property names like Items are changed again, multiple services/tests will be affected
+
+Priority 3 - Suggested Follow-up
+1. Keep Comman focused on stable contracts and shared exception types.
+2. If shared mapping grows more complex, consider replacing fragile reflection-heavy paths with explicit mapping.

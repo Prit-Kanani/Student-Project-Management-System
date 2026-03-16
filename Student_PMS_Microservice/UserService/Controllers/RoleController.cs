@@ -1,5 +1,6 @@
-﻿using Comman.DTOs.CommanDTOs;
+using Comman.DTOs.CommanDTOs;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProjectGroup.Services.RoleService;
 using UserService.DTOs;
@@ -8,20 +9,17 @@ namespace UserService.Controllers;
 
 [Route("api/UserService/[controller]")]
 [ApiController]
+[Authorize]
 public class RoleController(
-        IRoleService roleService,
-        IValidator<RoleCreateDTO> Create,
-        IValidator<RoleUpdateDTO> Update
+    IRoleService roleService,
+    IValidator<RoleCreateDTO> create,
+    IValidator<RoleUpdateDTO> update
 ) : ControllerBase
 {
+    private readonly IRoleService _roleService = roleService;
+    private readonly IValidator<RoleCreateDTO> _create = create;
+    private readonly IValidator<RoleUpdateDTO> _update = update;
 
-    #region CONFIGURATION
-        private readonly IRoleService _roleService = roleService;
-        private readonly IValidator<RoleCreateDTO> _create = Create;
-        private readonly IValidator<RoleUpdateDTO> _update = Update;
-    #endregion
-
-    #region GET ROLES
     [HttpGet("Page")]
     [Produces<ListResult<RoleListDTO>>]
     public async Task<IActionResult> GetRoles()
@@ -29,19 +27,15 @@ public class RoleController(
         var response = await _roleService.GetRolesPage();
         return Ok(response);
     }
-    #endregion
 
-    #region VIEW ROLE
     [HttpGet("View/{roleID}")]
     [Produces<RoleViewDTO>]
     public async Task<IActionResult> ViewRole([FromRoute] int roleID)
     {
-       var response = await _roleService.GetRoleView(roleID);
-       return Ok(response);
+        var response = await _roleService.GetRoleView(roleID);
+        return Ok(response);
     }
-    #endregion
 
-    #region GET ROLE BY PK
     [HttpGet("Pk/{roleID}")]
     [Produces<RoleUpdateDTO>]
     public async Task<IActionResult> GetRolePK([FromRoute] int roleID)
@@ -49,9 +43,7 @@ public class RoleController(
         var response = await _roleService.GetRolePK(roleID);
         return Ok(response);
     }
-    #endregion
 
-    #region GET ROLE DROPDOWN
     [HttpGet("Dropdown")]
     [Produces<OptionDTO>]
     public async Task<IActionResult> GetRoleDropdown()
@@ -59,9 +51,7 @@ public class RoleController(
         var response = await _roleService.GetRoleDropdown();
         return Ok(response);
     }
-    #endregion
 
-    #region CREATE ROLE
     [HttpPost("Insert")]
     [Produces<OperationResultDTO>]
     public async Task<IActionResult> CreateRole([FromBody] RoleCreateDTO dto)
@@ -70,9 +60,7 @@ public class RoleController(
         var response = await _roleService.CreateRole(dto);
         return Ok(response);
     }
-    #endregion
 
-    #region UPDATE ROLE
     [HttpPut("Update")]
     [Produces<OperationResultDTO>]
     public async Task<IActionResult> UpdateRole([FromBody] RoleUpdateDTO dto)
@@ -81,15 +69,12 @@ public class RoleController(
         var response = await _roleService.UpdateRole(dto);
         return Ok(response);
     }
-    #endregion
 
-    #region DEACTIVATE ROLE
     [HttpDelete("Deactivate/{roleId}")]
     [Produces<OperationResultDTO>]
     public async Task<IActionResult> DeactivateRole([FromRoute] int roleId)
     {
-        var response =  await _roleService.DeactivateRole(roleId);
+        var response = await _roleService.DeactivateRole(roleId);
         return Ok(response);
     }
-    #endregion
 }

@@ -27,6 +27,13 @@ public static class ReflectionMapper
             return (TDestination)MapListToWrapper(source, sourceType, destType);
         }
 
+        // if source is IEnumerable (but not string) and destination is List<T>
+        if (IsEnumerable(sourceType) && destType.IsGenericType &&
+            destType.GetGenericTypeDefinition() == typeof(List<>))
+        {
+            return (TDestination)MapList(source, sourceType, destType);
+        }
+
         var key = $"{sourceType.FullName}->{destType.FullName}";
         var mapper = _mapCache.GetOrAdd(key, _ => CreateMapper(sourceType, destType));
         return (TDestination)mapper(source);
@@ -60,6 +67,25 @@ public static class ReflectionMapper
         return wrapper;
     }
 
+    private static object MapList(object source, Type sourceType, Type listType)
+    {
+        var itemDestType = listType.GetGenericArguments()[0];
+        var itemSourceType = GetListItemType(sourceType);
+
+        var list = (IEnumerable)source;
+        var mappedList = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(itemDestType))!;
+
+        var key = $"{itemSourceType.FullName}->{itemDestType.FullName}";
+        var itemMapper = _mapCache.GetOrAdd(key, _ => CreateMapper(itemSourceType, itemDestType));
+
+        foreach (var item in list)
+        {
+            mappedList.Add(itemMapper(item));
+        }
+
+        return mappedList;
+    }
+
     private static Func<object, object> CreateMapper(Type sourceType, Type destType)
     {
         // Build mapping expression: sourceObj => (object) new Dest { Prop = (converted) ((Source)sourceObj).Prop, ... }
@@ -75,13 +101,17 @@ public static class ReflectionMapper
         var destProperties = destType.GetProperties(BindingFlags.Public | BindingFlags.Instance)
             .Where(p => p.CanWrite);
 
-        var sourceProperties = sourceType.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+        var sourcePropertyList = sourceType.GetProperties(BindingFlags.Public | BindingFlags.Instance)
             .Where(p => p.CanRead)
+            .ToArray();
+
+        var sourceProperties = sourcePropertyList
             .ToDictionary(p => p.Name, p => p, StringComparer.OrdinalIgnoreCase);
 
         foreach (var destProp in destProperties)
         {
-            if (sourceProperties.TryGetValue(destProp.Name, out var srcProp))
+            var srcProp = ResolveSourceProperty(destType, destProp, sourceProperties, sourcePropertyList);
+            if (srcProp is not null)
             {
                 // try to convert srcProp value to destProp type where possible
                 Expression srcValue = Expression.Property(typedSource, srcProp);
@@ -110,6 +140,33 @@ public static class ReflectionMapper
         var lambda = Expression.Lambda<Func<object, object>>(block, sourceParam);
 
         return lambda.Compile();
+    }
+
+    private static PropertyInfo? ResolveSourceProperty(
+        Type destType,
+        PropertyInfo destProp,
+        Dictionary<string, PropertyInfo> sourceProperties,
+        PropertyInfo[] sourcePropertyList)
+    {
+        if (sourceProperties.TryGetValue(destProp.Name, out var directMatch))
+        {
+            return directMatch;
+        }
+
+        if (destType == typeof(OptionDTO))
+        {
+            if (destProp.Name.Equals(nameof(OptionDTO.Id), StringComparison.OrdinalIgnoreCase))
+            {
+                return sourcePropertyList.FirstOrDefault(p => p.IsDefined(typeof(OptionIdAttribute), inherit: true));
+            }
+
+            if (destProp.Name.Equals(nameof(OptionDTO.Name), StringComparison.OrdinalIgnoreCase))
+            {
+                return sourcePropertyList.FirstOrDefault(p => p.IsDefined(typeof(OptionNameAttribute), inherit: true));
+            }
+        }
+
+        return null;
     }
 
     private static bool IsEnumerable(Type type)

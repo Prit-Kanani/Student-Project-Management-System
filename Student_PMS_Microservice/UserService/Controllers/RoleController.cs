@@ -45,7 +45,7 @@ public class RoleController(
     }
 
     [HttpGet("Dropdown")]
-    [Produces<OptionDTO>]
+    [Produces<List<OptionDTO>>]
     public async Task<IActionResult> GetRoleDropdown()
     {
         var response = await _roleService.GetRoleDropdown();

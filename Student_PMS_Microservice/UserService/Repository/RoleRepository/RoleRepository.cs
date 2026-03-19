@@ -3,14 +3,17 @@ using Comman.Exceptions;
 using Comman.Functions;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.JsonWebTokens;
 using ProjectGroup.Data;
+using System.Security.Claims;
 using UserService.DTOs;
 using UserService.Models;
 
 namespace UserService.Repository.RoleRepository;
 
 public class RoleRepository(
-    AppDbContext context
+    AppDbContext context,
+    IHttpContextAccessor httpContextAccessor
 ) : IRoleRepository
 {
     private readonly AppDbContext _context = context;
@@ -89,7 +92,7 @@ public class RoleRepository(
             ?? throw new NotFoundException("Role not found");
 
         dto.Adapt(role);
-        role.ModifiedByID = 1;
+        role.ModifiedByID = GetModifiedById(httpContextAccessor);
         role.Modified = DateTime.UtcNow;
 
         var rows = await _context.SaveChangesAsync();
@@ -102,7 +105,27 @@ public class RoleRepository(
 
     public async Task<List<OptionDTO>> GetRoleDropdown()
     {
-        var roles = await _context.Role.Where(r => r.IsActive).ToListAsync();
+        var roles = await _context.Role
+            .AsNoTracking()
+            .Where(r => r.IsActive)
+            .OrderBy(r => r.RoleName)
+            .ToListAsync();
+
         return ReflectionMapper.Map<List<OptionDTO>>(roles);
+    }
+
+    private static int GetModifiedById(IHttpContextAccessor accessor)
+    {
+        var user = accessor.HttpContext?.User;
+        var claimValue = user?.FindFirst(ClaimTypes.NameIdentifier)?.Value
+            ?? user?.FindFirst(JwtRegisteredClaimNames.Sub)?.Value
+            ?? user?.FindFirst("sub")?.Value;
+
+        if (int.TryParse(claimValue, out var userId))
+        {
+            return userId;
+        }
+
+        throw new UnauthorizedException("Authenticated user id is required");
     }
 }

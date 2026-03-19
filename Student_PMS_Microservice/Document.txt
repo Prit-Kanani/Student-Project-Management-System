@@ -1,0 +1,221 @@
+Student PMS Microservice - API Gateway Endpoint Document
+Updated on: 2026-03-18
+
+Base URL
+- https://localhost:7095
+
+Auth Rule
+- Public: /api/Auth/login, /api/Auth/register
+- All other endpoints require JWT bearer token.
+
+==================================================
+1) UserService Endpoints (via ApiGateway)
+==================================================
+
+Model: Auth
+- POST /api/Auth/login
+  Request: LoginDTO
+  Return: AuthResponseDTO
+
+- POST /api/Auth/register
+  Request: UserCreateDTO
+  Return: OperationResultDTO
+
+Model: User
+- GET /api/UserService/User/Page
+  Return: ListResult<UserListDTO>
+
+- GET /api/UserService/User/Pk/{userId}
+  Return: UserUpdateDTO
+
+- GET /api/UserService/User/View/{userID}
+  Return: UserViewDTO
+
+- POST /api/UserService/User/Insert
+  Request: UserCreateDTO
+  Return: OperationResultDTO
+
+- PUT /api/UserService/User/Update
+  Request: UserUpdateDTO
+  Return: OperationResultDTO
+
+- DELETE /api/UserService/User/Deactivate/{userid}
+  Return: OperationResultDTO
+
+- POST /api/UserService/User/CreatedAndModifiedBy?createdByID={id}&modifiedByID={id}
+  Return: CreatedAndModifiedDTO
+
+- GET /api/UserService/User/ResolveAuditUsers?createdByID={id}&modifiedByID={id?}&approvedByID={id?}
+  Return: AuditUsersDTO
+
+Model: Role
+- GET /api/UserService/Role/Page
+  Return: ListResult<RoleListDTO>
+
+- GET /api/UserService/Role/View/{roleID}
+  Return: RoleViewDTO
+
+- GET /api/UserService/Role/Pk/{roleID}
+  Return: RoleUpdateDTO
+
+- GET /api/UserService/Role/Dropdown
+  Return: OptionDTO
+
+- POST /api/UserService/Role/Insert
+  Request: RoleCreateDTO
+  Return: OperationResultDTO
+
+- PUT /api/UserService/Role/Update
+  Request: RoleUpdateDTO
+  Return: OperationResultDTO
+
+- DELETE /api/UserService/Role/Deactivate/{roleId}
+  Return: OperationResultDTO
+
+Model: UserProfile
+- GET /api/UserService/UserProfile/Page
+  Return: ListResult<UserProfileListDTO>
+
+- GET /api/UserService/UserProfile/View/{userID}
+  Return: UserProfileViewDTO
+
+- GET /api/UserService/UserProfile/Pk/{userID}
+  Return: UserProfileUpdateDTO
+
+- POST /api/UserService/UserProfile/Insert
+  Request: UserProfileCreateDTO
+  Return: OperationResultDTO
+
+- PUT /api/UserService/UserProfile/Update
+  Request: UserProfileUpdateDTO
+  Return: OperationResultDTO
+
+==================================================
+2) ProjectService Endpoints (via ApiGateway)
+==================================================
+
+Model: Project
+- GET /api/ProjectService/Project/Page
+  Return: ListResult<ProjectListDTO>
+
+- GET /api/ProjectService/Project/View/{id}
+  Return: ProjectViewDTO
+
+- GET /api/ProjectService/Project/PK/{id}
+  Return: ProjectUpdateDTO
+
+- GET /api/ProjectService/Project/Exists/{id}
+  Return: EntityExistsDTO
+
+- POST /api/ProjectService/Project/Create
+  Request: ProjectCreateDTO
+  Return: OperationResultDTO
+
+- PUT /api/ProjectService/Project/Update
+  Request: ProjectUpdateDTO
+  Return: OperationResultDTO
+
+- DELETE /api/ProjectService/Project/Delete/{id}
+  Return: OperationResultDTO
+
+==================================================
+3) ProjectGroupService Endpoints (via ApiGateway)
+==================================================
+
+Model: ProjectGroup
+- GET /api/ProjectGroupService/ProjectGroup/Page
+  Return: ListResult<ProjectGroupListDTO>
+
+- GET /api/ProjectGroupService/ProjectGroup/PK/{id}
+  Return: ProjectGroupUpdateDTO
+
+- GET /api/ProjectGroupService/ProjectGroup/View/{id}
+  Return: ProjectGroupViewDTO
+
+- POST /api/ProjectGroupService/ProjectGroup/Create
+  Request: ProjectGroupCreateDTO
+  Return: OperationResultDTO
+
+- POST /api/ProjectGroupService/ProjectGroup/Update
+  Request: ProjectGroupUpdateDTO
+  Return: OperationResultDTO
+
+- DELETE /api/ProjectGroupService/ProjectGroup/Deactivate/{id}
+  Return: OperationResultDTO
+
+Model: ProjectGroupByProject
+- GET /api/ProjectGroupService/ProjectGroupByProject/Page
+  Return: ListResult<ProjectGroupByProjectListDTO>
+
+- GET /api/ProjectGroupService/ProjectGroupByProject/View/{id}
+  Return: ProjectGroupByProjectViewDTO
+
+- GET /api/ProjectGroupService/ProjectGroupByProject/PK/{id}
+  Return: ProjectGroupByProjectUpdateDTO
+
+- POST /api/ProjectGroupService/ProjectGroupByProject/Create
+  Request: ProjectGroupByProjectCreateDTO
+  Return: OperationResultDTO
+
+- POST /api/ProjectGroupService/ProjectGroupByProject/Update
+  Request: ProjectGroupByProjectUpdateDTO
+  Return: OperationResultDTO
+
+- DELETE /api/ProjectGroupService/ProjectGroupByProject/Deactivate/{id}
+  Return: OperationResultDTO
+
+Model: GroupWiseStudent
+- GET /api/ProjectGroupService/GroupWiseStudent/Page?skip={n}&take={n}
+  Return: ListResult<GroupWiseStudentListDTO>
+
+- GET /api/ProjectGroupService/GroupWiseStudent/{groupWiseStudentId}
+  Return: GroupWiseStudentUpdateDTO
+
+- GET /api/ProjectGroupService/GroupWiseStudent/View/{groupWiseStudentId}
+  Return: GroupWiseStudentViewDTO
+
+- POST /api/ProjectGroupService/GroupWiseStudent/Create
+  Request: GroupWiseStudentCreateDTO
+  Return: OperationResultDTO
+
+- POST /api/ProjectGroupService/GroupWiseStudent/Update
+  Request: GroupWiseStudentUpdateDTO
+  Return: OperationResultDTO
+
+- DELETE /api/ProjectGroupService/GroupWiseStudent/Deactivate/{groupWiseStudentId}
+  Return: OperationResultDTO
+
+==================================================
+4) Common DTOs (Comman Library)
+==================================================
+
+OperationResultDTO
+- Id: int
+- RowsAffected: int
+
+ListResult<T>
+- TotalCount: int
+- Items: List<T>
+
+OptionDTO
+- Id: int
+- Name: string
+
+JwtSettings
+- SecretKey: string
+- Issuer: string
+- Audience: string
+- ExpiryMinutes: int
+
+CreatedAndModifiedDTO
+- CreatedBy: string
+- ModifiedBy: string
+
+AuditUsersDTO
+- CreatedBy: string
+- ModifiedBy: string
+- ApprovedBy: string
+
+EntityExistsDTO
+- Id: int
+- Exists: bool

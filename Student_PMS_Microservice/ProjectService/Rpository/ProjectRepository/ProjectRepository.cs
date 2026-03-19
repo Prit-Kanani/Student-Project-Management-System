@@ -34,7 +34,16 @@ public class ProjectRepository(
         var project = await _context.Projects.FirstOrDefaultAsync(p => p.ProjectID == projectID)
             ?? throw new NotFoundException("Project not found");
 
-        return ReflectionMapper.Map<ProjectUpdateDTO>(project);
+        return new ProjectUpdateDTO
+        {
+            ProjectID = project.ProjectID,
+            ProjectName = project.ProjectName,
+            Description = project.Description,
+            IsApproved = project.IsApproved,
+            IsActive = project.IsActive,
+            IsCompleted = project.IsCompleted,
+            ModifiedByID = project.ModifiedByID ?? 0
+        };
     }
 
     public async Task<OperationResultDTO> CreateProject(ProjectCreateDTO dto)
@@ -73,6 +82,6 @@ public class ProjectRepository(
 
     public async Task<bool> ProjectExists(int projectID)
     {
-        return await _context.Projects.AnyAsync(p => p.ProjectID == projectID && p.IsActive);
+        return await _context.Projects.AnyAsync(p => p.ProjectID == projectID);
     }
 }

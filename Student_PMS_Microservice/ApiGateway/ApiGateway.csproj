@@ -15,7 +15,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Comman\Comman.csproj" />
+    <Compile Include="..\Comman\DTOs\**\*.cs" LinkBase="Comman\DTOs" />
+    <Compile Include="..\Comman\Exceptions\**\*.cs" LinkBase="Comman\Exceptions" />
+    <Compile Include="..\Comman\Functions\**\*.cs" LinkBase="Comman\Functions" />
   </ItemGroup>
 
 </Project>

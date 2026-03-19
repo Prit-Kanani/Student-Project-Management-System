@@ -38,7 +38,7 @@ public class ProjectController(
 
     [HttpGet]
     [Route("PK/{id:int}")]
-    [Produces<ProjectViewDTO>]
+    [Produces<ProjectUpdateDTO>]
     public async Task<IActionResult> GetProjectPk(int id)
     {
         var response = await projectServices.GetProjectPK(id);

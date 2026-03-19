@@ -11,6 +11,7 @@ public class ProjectListDTO
 
 public class ProjectViewDTO
 {
+    public int ProjectID { get; set; }
     public string ProjectName { get; set; } = string.Empty;
     public bool? IsApproved { get; set; }
     public string? Description { get; set; }

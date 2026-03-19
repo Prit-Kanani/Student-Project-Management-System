@@ -1,4 +1,5 @@
 using Comman.DTOs.CommanDTOs;
+using Comman.Exceptions;
 using Comman.MicroserviceDTO;
 using ProjectService.DTOs;
 using ProjectService.Rpository.ProjectRepository;
@@ -8,11 +9,13 @@ namespace ProjectService.Services.ProjectServices;
 
 public class ProjectService(
     IProjectRepository repository,
-    UserServiceClient userServiceClient
+    UserServiceClient userServiceClient,
+    ILogger<ProjectService> logger
 ) : IProjectServices
 {
     private readonly IProjectRepository _repository = repository;
     private readonly UserServiceClient _userServiceClient = userServiceClient;
+    private readonly ILogger<ProjectService> _logger = logger;
 
     public async Task<ListResult<ProjectListDTO>> GetProjectsPage()
     {
@@ -22,9 +25,31 @@ public class ProjectService(
     public async Task<ProjectViewDTO> GetProjectView(int projectID)
     {
         var response = await _repository.GetProjectView(projectID);
-        var auditUsers = await _userServiceClient.ResolveAuditUsers(response.CreatedByID, response.ModifiedByID, null);
-        response.CreatedBy = auditUsers.CreatedBy;
-        response.ModifiedBy = auditUsers.ModifiedBy;
+
+        try
+        {
+            var auditUsers = await _userServiceClient.ResolveAuditUsers(
+                response.CreatedByID,
+                response.ModifiedByID,
+                null
+            );
+
+            response.CreatedBy = auditUsers.CreatedBy;
+            response.ModifiedBy = auditUsers.ModifiedBy;
+        }
+        catch (Exception ex) when (
+            ex is ApiException ||
+            ex is HttpRequestException ||
+            ex is TaskCanceledException
+        )
+        {
+            _logger.LogWarning(
+                ex,
+                "Audit user resolution failed for project {ProjectID}. Returning the core project payload without audit names.",
+                projectID
+            );
+        }
+
         return response;
     }
 

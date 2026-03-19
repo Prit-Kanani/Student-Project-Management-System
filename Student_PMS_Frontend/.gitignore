@@ -29,6 +29,9 @@ project.txt
 Document.txt
 __logincheck.cs
 
+# Local verification artifacts
+.codex-temp/
+
 # User specific environment files
 .env
 .env.local

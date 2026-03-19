@@ -35,6 +35,11 @@ import {
   UserFormPage,
   UsersPage,
 } from "./UserServices/pages";
+import {
+  ProjectDetailPage,
+  ProjectFormPage,
+  ProjectsPage,
+} from "./ProjectServices/pages";
 
 export default function App() {
   return (
@@ -78,6 +83,17 @@ export default function App() {
                     {/* Charts */}
                     <Route path="/line-chart" element={<LineChart />} />
                     <Route path="/bar-chart" element={<BarChart />} />
+
+                    {/* Project Services */}
+                    <Route path="/projects" element={<ProjectsPage />} />
+                    <Route path="/projects/:projectId" element={<ProjectDetailPage />} />
+                    <Route element={<ProtectedRoute allowedRoles={["Admin", "Faculty"]} />}>
+                      <Route path="/projects/new" element={<ProjectFormPage mode="create" />} />
+                      <Route
+                        path="/projects/:projectId/edit"
+                        element={<ProjectFormPage mode="edit" />}
+                      />
+                    </Route>
 
                     {/* User Services */}
                     <Route element={<ProtectedRoute allowedRoles={["Admin"]} />}>

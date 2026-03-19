@@ -4,6 +4,7 @@ import { useAuth } from "@/AuthServices/components";
 import {
   CalenderIcon,
   ChevronDownIcon,
+  FolderIcon,
   GridIcon,
   HorizontaLDots,
   PageIcon,
@@ -36,6 +37,11 @@ const mainNavItems: NavItem[] = [
     icon: <UserCircleIcon />,
     name: "My Account",
     path: "/account",
+  },
+  {
+    icon: <FolderIcon />,
+    name: "Projects",
+    path: "/projects",
   },
   {
     icon: <UserCircleIcon />,

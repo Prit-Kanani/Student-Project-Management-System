@@ -1,4 +1,5 @@
 using Comman.DTOs.CommanDTOs;
+using Comman.Exceptions;
 using ProjectGroupService.DTOs;
 using ProjectGroupService.Repository.ProjectGroupByProject;
 using ProjectGroupService.Services.External;
@@ -8,7 +9,8 @@ namespace ProjectGroupService.Services.ProjectGroupByProject;
 public class ProjectGroupByProjectService(
     IProjectGroupByProjectRepository repository,
     UserServiceClient userServiceClient,
-    ProjectServiceClient projectServiceClient
+    ProjectServiceClient projectServiceClient,
+    ILogger<ProjectGroupByProjectService> logger
 ) : IProjectGroupByProjectService
 {
     public async Task<ListResult<ProjectGroupByProjectListDTO>> GetProjectGroupByProjectsPage()
@@ -19,9 +21,31 @@ public class ProjectGroupByProjectService(
     public async Task<ProjectGroupByProjectViewDTO> GetProjectGroupByProjectView(int projectGroupByProjectID)
     {
         var response = await repository.GetProjectGroupByProjectView(projectGroupByProjectID);
-        var auditUsers = await userServiceClient.ResolveAuditUsers(response.CreatedByID, response.ModifiedByID, null);
-        response.CreatedBy = auditUsers.CreatedBy;
-        response.ModifiedBy = auditUsers.ModifiedBy;
+
+        try
+        {
+            var auditUsers = await userServiceClient.ResolveAuditUsers(
+                response.CreatedByID,
+                response.ModifiedByID,
+                null
+            );
+
+            response.CreatedBy = auditUsers.CreatedBy;
+            response.ModifiedBy = auditUsers.ModifiedBy;
+        }
+        catch (Exception ex) when (
+            ex is ApiException ||
+            ex is HttpRequestException ||
+            ex is TaskCanceledException
+        )
+        {
+            logger.LogWarning(
+                ex,
+                "Audit user resolution failed for project-group mapping {ProjectGroupByProjectID}. Returning the core payload without audit names.",
+                projectGroupByProjectID
+            );
+        }
+
         return response;
     }
 

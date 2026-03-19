@@ -132,18 +132,58 @@ public class ProjectGroupByProjectRepository(
 
     public async Task<OperationResultDTO> UpdateProjectGroupByProject(ProjectGroupByProjectUpdateDTO dto)
     {
-        var parameters = new DynamicParameters(dto);
-        parameters.Add("@RowsAffected", dbType: DbType.Int32, direction: ParameterDirection.Output);
-
         using var connection = dapperContext.CreateConnection();
 
+        const string existsSql = "SELECT COUNT(1) FROM dbo.ProjectGroupByProject WHERE ProjectGroupByProjectID = @ProjectGroupByProjectID";
+        var exists = await connection.ExecuteScalarAsync<int>(existsSql, new
+        {
+            dto.ProjectGroupByProjectID
+        });
+
+        if (exists == 0)
+        {
+            throw new NotFoundException("Project Group By Project not found or no changes detected");
+        }
+
+        const string duplicateSql = @"
+SELECT COUNT(1)
+FROM dbo.ProjectGroupByProject
+WHERE ProjectGroupID = @ProjectGroupID
+  AND ProjectID = @ProjectID
+  AND ProjectGroupByProjectID <> @ProjectGroupByProjectID;";
+
+        var duplicateCount = await connection.ExecuteScalarAsync<int>(duplicateSql, new
+        {
+            dto.ProjectGroupID,
+            dto.ProjectID,
+            dto.ProjectGroupByProjectID
+        });
+
+        if (duplicateCount > 0)
+        {
+            throw new DuplicateKeyException("Duplicate Project Group By Project record", 2601);
+        }
+
+        const string updateSql = @"
+UPDATE dbo.ProjectGroupByProject
+SET IsActive = @IsActive,
+    ProjectGroupID = @ProjectGroupID,
+    ProjectID = @ProjectID,
+    ModifiedByID = @ModifiedByID,
+    Modified = SYSUTCDATETIME()
+WHERE ProjectGroupByProjectID = @ProjectGroupByProjectID;";
+
+        int rows;
         try
         {
-            await connection.ExecuteAsync(
-                "PR_ProjectGroupByProjectService_Update",
-                parameters,
-                commandType: CommandType.StoredProcedure
-            );
+            rows = await connection.ExecuteAsync(updateSql, new
+            {
+                dto.IsActive,
+                dto.ProjectGroupID,
+                dto.ProjectID,
+                dto.ModifiedByID,
+                dto.ProjectGroupByProjectID
+            });
         }
         catch (SqlException ex)
         {
@@ -156,7 +196,6 @@ public class ProjectGroupByProjectRepository(
             };
         }
 
-        var rows = parameters.Get<int>("@RowsAffected");
         if (rows == 0)
         {
             throw new NotFoundException("Project Group By Project not found or no changes detected");

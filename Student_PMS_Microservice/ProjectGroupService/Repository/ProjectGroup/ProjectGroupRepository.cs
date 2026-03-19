@@ -12,34 +12,24 @@ namespace ProjectGroupService.Repository.ProjectGroup;
 
 public class ProjectGroupRepository(
     AppDbContext context,
-    IDistributedCache cache
+    IDistributedCache cache,
+    ILogger<ProjectGroupRepository> logger
 ) : IProjectGroupRepository
 {
     private const string ProjectGroupPageCacheKey = "ProjectGroupPage";
 
     public async Task<ListResult<ProjectGroupListDTO>> GetProjectGroupsPage()
     {
-        var cachedData = await cache.GetStringAsync(ProjectGroupPageCacheKey);
-        if (!string.IsNullOrEmpty(cachedData))
+        var cachedResponse = await TryGetCachedPage();
+        if (cachedResponse is not null)
         {
-            var cachedResponse = JsonSerializer.Deserialize<ListResult<ProjectGroupListDTO>>(cachedData);
-            if (cachedResponse is not null)
-            {
-                return cachedResponse;
-            }
+            return cachedResponse;
         }
 
         var projectGroups = await context.ProjectGroup.AsNoTracking().ToListAsync();
         var response = ReflectionMapper.Map<ListResult<ProjectGroupListDTO>>(projectGroups);
 
-        var cacheOptions = new DistributedCacheEntryOptions
-        {
-            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10)
-        };
-
-        var serializedData = JsonSerializer.Serialize(response);
-        await cache.SetStringAsync(ProjectGroupPageCacheKey, serializedData, cacheOptions);
-
+        await TrySetCachedPage(response);
         return response;
     }
 
@@ -65,7 +55,7 @@ public class ProjectGroupRepository(
         projectGroup.Created = DateTime.UtcNow;
         await context.ProjectGroup.AddAsync(projectGroup);
         var rows = await context.SaveChangesAsync();
-        await cache.RemoveAsync(ProjectGroupPageCacheKey);
+        await TryRemovePageCache();
 
         return new OperationResultDTO
         {
@@ -82,7 +72,7 @@ public class ProjectGroupRepository(
         dto.Adapt(projectGroup);
         projectGroup.Modified = DateTime.UtcNow;
         var rows = await context.SaveChangesAsync();
-        await cache.RemoveAsync(ProjectGroupPageCacheKey);
+        await TryRemovePageCache();
 
         return new OperationResultDTO
         {
@@ -99,12 +89,61 @@ public class ProjectGroupRepository(
         projectGroup.IsActive = false;
         projectGroup.Modified = DateTime.UtcNow;
         var rows = await context.SaveChangesAsync();
-        await cache.RemoveAsync(ProjectGroupPageCacheKey);
+        await TryRemovePageCache();
 
         return new OperationResultDTO
         {
             Id = projectGroup.ProjectGroupID,
             RowsAffected = rows
         };
+    }
+
+    private async Task<ListResult<ProjectGroupListDTO>?> TryGetCachedPage()
+    {
+        try
+        {
+            var cachedData = await cache.GetStringAsync(ProjectGroupPageCacheKey);
+            if (string.IsNullOrEmpty(cachedData))
+            {
+                return null;
+            }
+
+            return JsonSerializer.Deserialize<ListResult<ProjectGroupListDTO>>(cachedData);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "ProjectGroup page cache read failed. Falling back to the database.");
+            return null;
+        }
+    }
+
+    private async Task TrySetCachedPage(ListResult<ProjectGroupListDTO> response)
+    {
+        try
+        {
+            var cacheOptions = new DistributedCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10)
+            };
+
+            var serializedData = JsonSerializer.Serialize(response);
+            await cache.SetStringAsync(ProjectGroupPageCacheKey, serializedData, cacheOptions);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "ProjectGroup page cache write failed. Returning uncached response.");
+        }
+    }
+
+    private async Task TryRemovePageCache()
+    {
+        try
+        {
+            await cache.RemoveAsync(ProjectGroupPageCacheKey);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "ProjectGroup page cache invalidation failed after a write operation.");
+        }
     }
 }

@@ -6,6 +6,9 @@
 # dotenv files
 .env
 
+# Frontend build output
+Student_PMS_Frontend/dist/
+
 # Local dotnet CLI home used for sandboxed builds
 Student_PMS_Microservice/.dotnet-home/
 Student_PMS_Microservice/.verify/

@@ -8,9 +8,19 @@ const readValue = (source: unknown, keys: string[]) => {
     return undefined;
   }
 
+  const sourceKeys = Object.keys(source);
+
   for (const key of keys) {
     if (key in source) {
       return source[key];
+    }
+
+    const lowerCaseMatch = sourceKeys.find(
+      (sourceKey) => sourceKey.toLowerCase() === key.toLowerCase(),
+    );
+
+    if (lowerCaseMatch) {
+      return source[lowerCaseMatch];
     }
   }
 

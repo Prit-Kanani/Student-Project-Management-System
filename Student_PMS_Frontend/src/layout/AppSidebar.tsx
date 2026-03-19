@@ -44,6 +44,15 @@ const mainNavItems: NavItem[] = [
     path: "/projects",
   },
   {
+    icon: <FolderIcon />,
+    name: "Project Groups",
+    subItems: [
+      { name: "Project Groups", path: "/project-groups" },
+      { name: "Group Projects", path: "/project-group-projects" },
+      { name: "Group Students", path: "/group-wise-students" },
+    ],
+  },
+  {
     icon: <UserCircleIcon />,
     name: "User Management",
     roles: ["Admin"],

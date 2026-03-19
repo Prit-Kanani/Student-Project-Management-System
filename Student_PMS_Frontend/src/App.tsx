@@ -40,6 +40,17 @@ import {
   ProjectFormPage,
   ProjectsPage,
 } from "./ProjectServices/pages";
+import {
+  GroupWiseStudentDetailPage,
+  GroupWiseStudentFormPage,
+  GroupWiseStudentsPage,
+  ProjectGroupByProjectDetailPage,
+  ProjectGroupByProjectFormPage,
+  ProjectGroupByProjectsPage,
+  ProjectGroupDetailPage,
+  ProjectGroupFormPage,
+  ProjectGroupsPage,
+} from "./ProjectGroupServices/pages";
 
 export default function App() {
   return (
@@ -87,11 +98,56 @@ export default function App() {
                     {/* Project Services */}
                     <Route path="/projects" element={<ProjectsPage />} />
                     <Route path="/projects/:projectId" element={<ProjectDetailPage />} />
+                    <Route path="/project-groups" element={<ProjectGroupsPage />} />
+                    <Route
+                      path="/project-groups/:projectGroupId"
+                      element={<ProjectGroupDetailPage />}
+                    />
+                    <Route
+                      path="/project-group-projects"
+                      element={<ProjectGroupByProjectsPage />}
+                    />
+                    <Route
+                      path="/project-group-projects/:projectGroupByProjectId"
+                      element={<ProjectGroupByProjectDetailPage />}
+                    />
+                    <Route
+                      path="/group-wise-students"
+                      element={<GroupWiseStudentsPage />}
+                    />
+                    <Route
+                      path="/group-wise-students/:groupWiseStudentId"
+                      element={<GroupWiseStudentDetailPage />}
+                    />
                     <Route element={<ProtectedRoute allowedRoles={["Admin", "Faculty"]} />}>
                       <Route path="/projects/new" element={<ProjectFormPage mode="create" />} />
                       <Route
                         path="/projects/:projectId/edit"
                         element={<ProjectFormPage mode="edit" />}
+                      />
+                      <Route
+                        path="/project-groups/new"
+                        element={<ProjectGroupFormPage mode="create" />}
+                      />
+                      <Route
+                        path="/project-groups/:projectGroupId/edit"
+                        element={<ProjectGroupFormPage mode="edit" />}
+                      />
+                      <Route
+                        path="/project-group-projects/new"
+                        element={<ProjectGroupByProjectFormPage mode="create" />}
+                      />
+                      <Route
+                        path="/project-group-projects/:projectGroupByProjectId/edit"
+                        element={<ProjectGroupByProjectFormPage mode="edit" />}
+                      />
+                      <Route
+                        path="/group-wise-students/new"
+                        element={<GroupWiseStudentFormPage mode="create" />}
+                      />
+                      <Route
+                        path="/group-wise-students/:groupWiseStudentId/edit"
+                        element={<GroupWiseStudentFormPage mode="edit" />}
                       />
                     </Route>
 

@@ -1,0 +1,9 @@
+export { default as GroupWiseStudentDetailPage } from "@/ProjectGroupServices/pages/GroupWiseStudentDetailPage";
+export { default as GroupWiseStudentFormPage } from "@/ProjectGroupServices/pages/GroupWiseStudentFormPage";
+export { default as GroupWiseStudentsPage } from "@/ProjectGroupServices/pages/GroupWiseStudentsPage";
+export { default as ProjectGroupByProjectDetailPage } from "@/ProjectGroupServices/pages/ProjectGroupByProjectDetailPage";
+export { default as ProjectGroupByProjectFormPage } from "@/ProjectGroupServices/pages/ProjectGroupByProjectFormPage";
+export { default as ProjectGroupByProjectsPage } from "@/ProjectGroupServices/pages/ProjectGroupByProjectsPage";
+export { default as ProjectGroupDetailPage } from "@/ProjectGroupServices/pages/ProjectGroupDetailPage";
+export { default as ProjectGroupFormPage } from "@/ProjectGroupServices/pages/ProjectGroupFormPage";
+export { default as ProjectGroupsPage } from "@/ProjectGroupServices/pages/ProjectGroupsPage";

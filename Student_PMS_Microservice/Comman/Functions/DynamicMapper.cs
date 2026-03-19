@@ -11,11 +11,11 @@ public static class ReflectionMapper
 {
     // cache compiled mappers: key = sourceType.FullName + "->" + destType.FullName
     private static readonly ConcurrentDictionary<string, Func<object, object>> _mapCache =
-        new ConcurrentDictionary<string, Func<object, object>>();
+        new();
 
     public static TDestination Map<TDestination>(object source)
     {
-        if (source == null) throw new ArgumentNullException(nameof(source));
+        ArgumentNullException.ThrowIfNull(source);
 
         var sourceType = source.GetType();
         var destType = typeof(TDestination);
@@ -94,10 +94,7 @@ public static class ReflectionMapper
         var assignSrc = Expression.Assign(typedSource, Expression.Convert(sourceParam, sourceType));
 
         var bindings = new List<MemberBinding>();
-        var destCtor = destType.GetConstructor(Type.EmptyTypes);
-        if (destCtor == null)
-            throw new InvalidOperationException($"Destination type {destType.FullName} must have a parameterless constructor.");
-
+        var destCtor = destType.GetConstructor(Type.EmptyTypes) ?? throw new InvalidOperationException($"Destination type {destType.FullName} must have a parameterless constructor.");
         var destProperties = destType.GetProperties(BindingFlags.Public | BindingFlags.Instance)
             .Where(p => p.CanWrite);
 
@@ -124,7 +121,7 @@ public static class ReflectionMapper
                 else
                 {
                     // attempt Convert with System.Convert.ChangeType at runtime if possible
-                    MethodInfo changeTypeMethod = typeof(Convert).GetMethod("ChangeType", new[] { typeof(object), typeof(Type) })!;
+                    MethodInfo changeTypeMethod = typeof(Convert).GetMethod("ChangeType", [typeof(object), typeof(Type)])!;
                     var changeTypeCall = Expression.Call(changeTypeMethod, Expression.Convert(srcValue, typeof(object)), Expression.Constant(destProp.PropertyType, typeof(Type)));
                     value = Expression.Convert(changeTypeCall, destProp.PropertyType);
                 }
@@ -136,7 +133,7 @@ public static class ReflectionMapper
         var newDest = Expression.New(destCtor);
         var memberInit = Expression.MemberInit(newDest, bindings);
 
-        var block = Expression.Block(new[] { typedSource }, assignSrc, Expression.Convert(memberInit, typeof(object)));
+        var block = Expression.Block([typedSource], assignSrc, Expression.Convert(memberInit, typeof(object)));
         var lambda = Expression.Lambda<Func<object, object>>(block, sourceParam);
 
         return lambda.Compile();
